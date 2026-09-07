@@ -1335,7 +1335,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Profile Dropdown Toggle
+            // TDropdown profil
             const profileBtn = document.getElementById('profile-btn');
             const profileMenu = document.getElementById('profile-menu');
             
@@ -1352,7 +1352,7 @@
                 });
             }
 
-            // Mobile menu toggle
+            //navigasi pada tampilan mobile.
             const mobileMenuBtn = document.getElementById('mobile-menu-btn');
             const sidebar = document.getElementById('sidebar');
             const sidebarOverlay = document.getElementById('sidebar-overlay');
@@ -1369,7 +1369,7 @@
                 });
             }
 
-            // Sidebar dropdown toggle (Accordion style)
+            // Dropdown sidebar dengan gaya Accordion
             const dropdownToggles = document.querySelectorAll('.sidebar-dropdown-toggle');
             dropdownToggles.forEach(toggle => {
                 const parent = toggle.closest('.sidebar-dropdown');
@@ -1381,7 +1381,7 @@
                 toggle.addEventListener('click', () => {
                     const isOpen = toggle.classList.contains('open');
                     
-                    // Close all other dropdowns
+                    // Tutup semua dropdown lainnya
                     dropdownToggles.forEach(otherToggle => {
                         if (otherToggle !== toggle) {
                             otherToggle.classList.remove('open');
@@ -1391,7 +1391,7 @@
                         }
                     });
 
-                    // Toggle current dropdown
+                    // Buka atau tutup dropdown yang dipilih
                     if (isOpen) {
                         toggle.classList.remove('open');
                         menu.classList.remove('show');
@@ -1488,15 +1488,15 @@
                             </svg>
                         </button>
                         <div class="sidebar-dropdown-menu {{ (request()->routeIs('adminp2mp.monitoring') || request()->routeIs('adminprodi.pengaturan.*')) ? 'show' : '' }}">
-    <a href="{{ route('adminp2mp.monitoring') }}" class="dropdown-link {{ request()->routeIs('adminp2mp.monitoring') ? 'active' : '' }}">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-        Monitor & Laporan
-    </a>
-    <a href="{{ route('adminprodi.pengaturan.index') }}" class="dropdown-link {{ request()->routeIs('adminprodi.pengaturan.*') ? 'active' : '' }}">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-        Pengaturan Sistem
-    </a>
-</div>
+                            <a href="{{ route('adminp2mp.monitoring') }}" class="dropdown-link {{ request()->routeIs('adminp2mp.monitoring') ? 'active' : '' }}">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                                Monitor & Laporan
+                            </a>
+                            <a href="{{ route('adminprodi.pengaturan.index') }}" class="dropdown-link {{ request()->routeIs('adminprodi.pengaturan.*') ? 'active' : '' }}">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                Pengaturan Sistem
+                            </a>
+                        </div>
                     </div>
                 @else
                     <!-- Dashboard -->
@@ -1715,7 +1715,7 @@
 
     <!-- Modal and AJAX Form Script -->
     <script>
-        // Modal functions
+        // membuka modal berdasarkan ID
         function openModal(id) {
             const modal = document.getElementById(id);
             if (modal) {
@@ -1724,17 +1724,18 @@
             }
         }
 
+        //menutup modal berdasarkan ID
         function closeModal(id) {
             const modal = document.getElementById(id);
             if (modal) {
                 modal.classList.remove('show');
                 document.body.style.overflow = '';
                 
-                // Reset form inside modal when closed
+                // mereset isi form
                 const form = modal.querySelector('form');
                 if (form && !form.classList.contains('no-auto-reset')) {
                     form.reset();
-                    // Clear any errors
+                    // enghapus pesan error
                     const errorMsgs = form.querySelectorAll('.form-error-custom');
                     errorMsgs.forEach(el => el.remove());
                     const invalidInputs = form.querySelectorAll('.is-invalid');
@@ -1743,7 +1744,7 @@
             }
         }
 
-        // Close modal when clicking outside
+        // modal otomatis tertutup ketika pengguna mengklik area luar
         document.addEventListener('click', function(event) {
             if (event.target.classList.contains('modal-overlay')) {
                 closeModal(event.target.id);
@@ -1825,7 +1826,7 @@
             });
         });
 
-        // Pengaturan Sistem Modal Logic
+        // mengambil data pengaturan dari server
         async function openPengaturanModal(url) {
             const modal = document.getElementById('pengaturan-sistem-modal');
             const contentDiv = document.getElementById('pengaturan-modal-content');
@@ -1854,7 +1855,7 @@
             }
         }
 
-        // Helper to load new settings when changing prodi in the modal select
+        // memuat pengaturan berdasarkan Prodi yang dipilih
         function loadPengaturanModal(prodiId) {
             const baseUrl = "{{ route('adminprodi.pengaturan.index') }}";
             openPengaturanModal(`${baseUrl}?prodi_id=${prodiId}`);
@@ -2017,6 +2018,7 @@
 
             <script>
             document.addEventListener('DOMContentLoaded', function () {
+                 // Mengambil elemen modal dan dropdown upload bukti Kaprodi
                 const kaprodiModal = document.getElementById('upload-bukti-modal-kaprodi');
                 const btnCloseKaprodiModal = document.getElementById('btn-close-kaprodi-modal');
                 const btnCancelKaprodiModal = document.getElementById('btn-cancel-kaprodi-modal');
@@ -2025,8 +2027,10 @@
 
                 if (!kaprodiModal) return;
 
+                //Menyimpan  pilihan Bukti IKU yang tersedia
                 const originalBuktiOptions = Array.from(buktiSelect.querySelectorAll('option')).filter(opt => opt.value !== '');
 
+                //Memfilter jenis bukti sesuai IKU/IKT yang dipilih
                 function updateKaprodiBuktiOptions() {
                     const selectedIkuId = ikuSelect.value;
                     buktiSelect.innerHTML = '<option value="">-- Pilih Jenis Bukti --</option>';
@@ -2044,10 +2048,12 @@
                     }
                 }
 
+                //Memperbarui pilihan bukti saat IKU/IKT berubah
                 if (ikuSelect) {
                     ikuSelect.addEventListener('change', updateKaprodiBuktiOptions);
                 }
 
+                // Membuka modal upload bukti Kaprodi dan menyesuaikan pilihan IKU/IKT
                 document.querySelectorAll('.btn-open-upload-modal-kaprodi').forEach(function (btn) {
                     btn.addEventListener('click', function (e) {
                         e.preventDefault();
@@ -2067,6 +2073,7 @@
                 if (btnCloseKaprodiModal) btnCloseKaprodiModal.addEventListener('click', closeKaprodiModal);
                 if (btnCancelKaprodiModal) btnCancelKaprodiModal.addEventListener('click', closeKaprodiModal);
 
+                //tutup kalo area luar
                 window.addEventListener('click', function (e) {
                     if (e.target === kaprodiModal) closeKaprodiModal();
                 });
@@ -2075,6 +2082,7 @@
                 const addFileBtn = document.getElementById('kaprodi-modal-add-file-btn');
 
                 if (fileContainer && addFileBtn) {
+                     // Mengecek file yang dipilih dan menampilkan keterangan file
                     function checkKaprodiFiles() {
                         let hasFile = false;
                         fileContainer.querySelectorAll('.kaprodi-file-input-card').forEach(card => {
@@ -2090,12 +2098,14 @@
                         addFileBtn.style.display = hasFile ? 'inline-flex' : 'none';
                     }
 
+                     // Mengecek perubahan file yang dipilih
                     fileContainer.addEventListener('change', function (e) {
                         if (e.target.classList.contains('kaprodi-file-selector-input')) {
                             checkKaprodiFiles();
                         }
                     });
 
+                      // Menambahkan input file baru
                     addFileBtn.addEventListener('click', function () {
                         const count = fileContainer.querySelectorAll('.kaprodi-file-input-card').length + 1;
                         const card = document.createElement('div');
@@ -2120,6 +2130,7 @@
                         fileContainer.appendChild(card);
                     });
 
+                     // Menghapus input file yang dipilih
                     fileContainer.addEventListener('click', function (e) {
                         const delBtn = e.target.closest('.remove-kaprodi-file-btn');
                         if (delBtn) {

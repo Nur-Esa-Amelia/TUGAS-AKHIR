@@ -1,5 +1,5 @@
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+function initAiEvalScript() {
     let currentPencapaianId = null;
     let currentEvaluationData = null;
 
@@ -80,23 +80,25 @@ document.addEventListener('DOMContentLoaded', function () {
             metaData.status + '</span> (Realisasi: ' + Math.round(metaData.realisasi) + ' dari Target: ' + metaData.target + ')'
             : 'Detail Rekomendasi AI';
 
-        modalTitle.textContent = 'Rekomendasi Analisis AI: ' + ikuName;
-        modalSubtitle.innerHTML = statusHtml;
-        modalBody.innerHTML = parseMarkdown(text);
+        if (modalTitle) modalTitle.textContent = 'Rekomendasi Analisis AI: ' + ikuName;
+        if (modalSubtitle) modalSubtitle.innerHTML = statusHtml;
+        if (modalBody) modalBody.innerHTML = parseMarkdown(text);
 
         // Reset Modes
-        modalModeReading.style.display = 'block';
-        modalModeEval.style.display = 'none';
-        btnEvalText.textContent = 'Penilaian AI';
-        btnToggleEvalMode.style.background = 'rgba(59, 130, 246, 0.15)';
-        btnToggleEvalMode.style.color = '#3b82f6';
-        btnToggleEvalMode.style.borderColor = 'rgba(59, 130, 246, 0.3)';
+        if (modalModeReading) modalModeReading.style.display = 'block';
+        if (modalModeEval) modalModeEval.style.display = 'none';
+        if (btnEvalText) btnEvalText.textContent = 'Penilaian AI';
+        if (btnToggleEvalMode) {
+            btnToggleEvalMode.style.background = 'rgba(59, 130, 246, 0.15)';
+            btnToggleEvalMode.style.color = '#3b82f6';
+            btnToggleEvalMode.style.borderColor = 'rgba(59, 130, 246, 0.3)';
+        }
 
         // Hide evaluation reading banner until fetched
         const evalBannerReading = document.getElementById('eval-banner-reading');
         if (evalBannerReading) evalBannerReading.style.display = 'none';
 
-        modal.style.display = 'flex';
+        if (modal) modal.style.display = 'flex';
 
         // Silently fetch existing evaluation info to populate banner
         fetch('/rekomendasi/penilaian/' + pencapaianId)
@@ -106,8 +108,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     currentEvaluationData = data;
                     if (data.metrics && evalBannerReading) {
                         const m = data.metrics;
-                        document.getElementById('eval-banner-text').innerHTML = 
-                            `✓ <strong>Rekomendasi ini telah diuji.</strong> F1-Score: <strong>${m.f1_score}%</strong> | Precision: <strong>${m.precision}%</strong> | Recall: <strong>${m.recall}%</strong> (Hallucination Rate: <strong>${data.system_metrics.hallucination_rate}%</strong>)`;
+                        const bannerText = document.getElementById('eval-banner-text');
+                        if (bannerText) {
+                            bannerText.innerHTML = 
+                                `✓ <strong>Rekomendasi ini telah diuji.</strong> F1-Score: <strong>${m.f1_score}%</strong> | Precision: <strong>${m.precision}%</strong> | Recall: <strong>${m.recall}%</strong> (Hallucination Rate: <strong>${data.system_metrics.hallucination_rate}%</strong>)`;
+                        }
                         evalBannerReading.style.display = 'flex';
                     }
                 }
@@ -117,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Toggle Evaluation Mode vs Reading Mode
     function toggleEvalMode() {
-        if (modalModeEval.style.display === 'none') {
+        if (modalModeEval && modalModeEval.style.display === 'none') {
             switchToEvaluationMode();
         } else {
             switchToReadingMode();
@@ -125,24 +130,28 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function switchToReadingMode() {
-        modalModeReading.style.display = 'block';
-        modalModeEval.style.display = 'none';
-        btnEvalText.textContent = 'Penilaian AI';
-        btnToggleEvalMode.style.background = 'rgba(59, 130, 246, 0.15)';
-        btnToggleEvalMode.style.color = '#3b82f6';
-        btnToggleEvalMode.style.borderColor = 'rgba(59, 130, 246, 0.3)';
+        if (modalModeReading) modalModeReading.style.display = 'block';
+        if (modalModeEval) modalModeEval.style.display = 'none';
+        if (btnEvalText) btnEvalText.textContent = 'Penilaian AI';
+        if (btnToggleEvalMode) {
+            btnToggleEvalMode.style.background = 'rgba(59, 130, 246, 0.15)';
+            btnToggleEvalMode.style.color = '#3b82f6';
+            btnToggleEvalMode.style.borderColor = 'rgba(59, 130, 246, 0.3)';
+        }
     }
 
     window.switchToEvaluationMode = function () {
-        modalModeReading.style.display = 'none';
-        modalModeEval.style.display = 'block';
-        btnEvalText.textContent = 'Lihat Rekomendasi';
-        btnToggleEvalMode.style.background = 'rgba(168, 85, 247, 0.15)';
-        btnToggleEvalMode.style.color = '#c084fc';
-        btnToggleEvalMode.style.borderColor = 'rgba(168, 85, 247, 0.3)';
+        if (modalModeReading) modalModeReading.style.display = 'none';
+        if (modalModeEval) modalModeEval.style.display = 'block';
+        if (btnEvalText) btnEvalText.textContent = 'Lihat Rekomendasi';
+        if (btnToggleEvalMode) {
+            btnToggleEvalMode.style.background = 'rgba(168, 85, 247, 0.15)';
+            btnToggleEvalMode.style.color = '#c084fc';
+            btnToggleEvalMode.style.borderColor = 'rgba(168, 85, 247, 0.3)';
+        }
 
-        evalLoading.style.display = 'flex';
-        evalContainer.style.display = 'none';
+        if (evalLoading) evalLoading.style.display = 'flex';
+        if (evalContainer) evalContainer.style.display = 'none';
 
         if (currentEvaluationData) {
             renderEvaluationForm(currentEvaluationData);
@@ -198,95 +207,102 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         acuanHtml += `</div>`;
-        document.getElementById('eval-data-acuan-body').innerHTML = acuanHtml;
+        const acuanBody = document.getElementById('eval-data-acuan-body');
+        if (acuanBody) acuanBody.innerHTML = acuanHtml;
 
         // 2. Claims List
         const claimsContainer = document.getElementById('claims-list-container');
-        claimsContainer.innerHTML = '';
+        if (claimsContainer) {
+            claimsContainer.innerHTML = '';
 
-        data.claims.forEach((claim, idx) => {
-            const card = document.createElement('div');
-            card.className = 'claim-card-item';
-            card.dataset.nomor = claim.nomor;
-            card.dataset.teks = claim.teks;
+            data.claims.forEach((claim, idx) => {
+                const card = document.createElement('div');
+                card.className = 'claim-card-item';
+                card.dataset.nomor = claim.nomor;
+                card.dataset.teks = claim.teks;
 
-            const isFaktual = (claim.status === 'faktual');
-            const isHalusinasi = (claim.status === 'halusinasi');
+                const isFaktual = (claim.status === 'faktual');
+                const isHalusinasi = (claim.status === 'halusinasi');
 
-            card.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
-                    <div style="display: flex; gap: 8px; align-items: flex-start;">
-                        <span class="badge-custom badge-purple" style="font-size: 0.7rem; flex-shrink: 0; margin-top: 2px;">${claim.nomor}</span>
-                        <p style="font-size: 0.85rem; color: var(--text-primary); margin: 0; line-height: 1.4;">${claim.teks}</p>
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                        <div style="display: flex; gap: 8px; align-items: flex-start;">
+                            <span class="badge-custom badge-purple" style="font-size: 0.7rem; flex-shrink: 0; margin-top: 2px;">${claim.nomor}</span>
+                            <p style="font-size: 0.85rem; color: var(--text-primary); margin: 0; line-height: 1.4;">${claim.teks}</p>
+                        </div>
                     </div>
-                </div>
-                <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px;">
-                    <div class="claim-option-btn ${isFaktual ? 'selected-faktual' : ''}" data-val="faktual">
-                        <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        Faktual (TP)
+                    <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px;">
+                        <div class="claim-option-btn ${isFaktual ? 'selected-faktual' : ''}" data-val="faktual">
+                            <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Faktual (TP)
+                        </div>
+                        <div class="claim-option-btn ${isHalusinasi ? 'selected-halusinasi' : ''}" data-val="halusinasi">
+                            <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            Halusinasi (FP)
+                        </div>
                     </div>
-                    <div class="claim-option-btn ${isHalusinasi ? 'selected-halusinasi' : ''}" data-val="halusinasi">
-                        <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                        Halusinasi (FP)
-                    </div>
-                </div>
-            `;
+                `;
 
-            // Attach Option Toggle Click Handler
-            const optBtns = card.querySelectorAll('.claim-option-btn');
-            optBtns.forEach(btn => {
-                btn.addEventListener('click', function () {
-                    optBtns.forEach(b => {
-                        b.classList.remove('selected-faktual', 'selected-halusinasi');
+                // Attach Option Toggle Click Handler
+                const optBtns = card.querySelectorAll('.claim-option-btn');
+                optBtns.forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        optBtns.forEach(b => {
+                            b.classList.remove('selected-faktual', 'selected-halusinasi');
+                        });
+                        const val = this.getAttribute('data-val');
+                        if (val === 'faktual') {
+                            this.classList.add('selected-faktual');
+                        } else {
+                            this.classList.add('selected-halusinasi');
+                        }
+                        card.dataset.status = val;
+                        recalculateMetrics();
                     });
-                    const val = this.getAttribute('data-val');
-                    if (val === 'faktual') {
-                        this.classList.add('selected-faktual');
-                    } else {
-                        this.classList.add('selected-halusinasi');
-                    }
-                    card.dataset.status = val;
-                    recalculateMetrics();
                 });
-            });
 
-            card.dataset.status = claim.status || 'faktual';
-            claimsContainer.appendChild(card);
-        });
+                card.dataset.status = claim.status || 'faktual';
+                claimsContainer.appendChild(card);
+            });
+        }
 
         // 3. FN List
         const fnContainer = document.getElementById('fn-list-container');
-        fnContainer.innerHTML = '';
+        if (fnContainer) {
+            fnContainer.innerHTML = '';
 
-        const fnItems = data.saved_fn && data.saved_fn.length > 0 ? data.saved_fn : [];
-        if (fnItems.length === 0) {
-            renderEmptyFnRow();
-        } else {
-            fnItems.forEach(text => renderFnRow(text));
+            const fnItems = data.saved_fn && data.saved_fn.length > 0 ? data.saved_fn : [];
+            if (fnItems.length === 0) {
+                renderEmptyFnRow();
+            } else {
+                fnItems.forEach(text => renderFnRow(text));
+            }
         }
 
         // 4. Initial Metrics Update
         updateMetricsUI(data.metrics, data.system_metrics);
 
-        evalLoading.style.display = 'none';
-        evalContainer.style.display = 'flex';
+        if (evalLoading) evalLoading.style.display = 'none';
+        if (evalContainer) evalContainer.style.display = 'flex';
 
         recalculateMetrics();
     }
 
     function renderEmptyFnRow() {
         const fnContainer = document.getElementById('fn-list-container');
-        if (fnContainer.children.length === 0) {
+        if (fnContainer && fnContainer.children.length === 0) {
             renderFnRow('');
         }
     }
 
     function renderFnRow(textValue) {
         const fnContainer = document.getElementById('fn-list-container');
+        if (!fnContainer) return;
+        
         const row = document.createElement('div');
         row.className = 'fn-row-item';
         row.style.display = 'flex';
@@ -303,14 +319,16 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
 
         const input = row.querySelector('.fn-input');
-        input.addEventListener('input', recalculateMetrics);
+        if (input) input.addEventListener('input', recalculateMetrics);
 
         const btnRemove = row.querySelector('.btn-remove-fn');
-        btnRemove.addEventListener('click', function () {
-            row.remove();
-            renderEmptyFnRow();
-            recalculateMetrics();
-        });
+        if (btnRemove) {
+            btnRemove.addEventListener('click', function () {
+                row.remove();
+                renderEmptyFnRow();
+                recalculateMetrics();
+            });
+        }
 
         fnContainer.appendChild(row);
     }
@@ -352,14 +370,26 @@ document.addEventListener('DOMContentLoaded', function () {
         const hasHallucination = (fp > 0);
 
         // Update DOM
-        document.getElementById('metric-total-claims').textContent = totalClaims;
-        document.getElementById('metric-tp').textContent = tp;
-        document.getElementById('metric-fp').textContent = fp;
-        document.getElementById('metric-fn').textContent = fn;
+        const elTotalClaims = document.getElementById('metric-total-claims');
+        if (elTotalClaims) elTotalClaims.textContent = totalClaims;
+        const elTp = document.getElementById('metric-tp');
+        if (elTp) elTp.textContent = tp;
+        const elFp = document.getElementById('metric-fp');
+        if (elFp) elFp.textContent = fp;
+        const elFn = document.getElementById('metric-fn');
+        if (elFn) elFn.textContent = fn;
 
-        document.getElementById('metric-precision').textContent = precision.toFixed(1) + '%';
-        document.getElementById('metric-recall').textContent = recall.toFixed(1) + '%';
-        document.getElementById('metric-f1').textContent = f1.toFixed(1) + '%';
+        const totalClaimsAi = tp + fp;
+        const liveHr = totalClaimsAi > 0 ? (fp / totalClaimsAi) * 100 : 0;
+
+        const elPrec = document.getElementById('metric-precision');
+        if (elPrec) elPrec.textContent = precision.toFixed(1) + '%';
+        const elRecall = document.getElementById('metric-recall');
+        if (elRecall) elRecall.textContent = recall.toFixed(1) + '%';
+        const elF1 = document.getElementById('metric-f1');
+        if (elF1) elF1.textContent = f1.toFixed(1) + '%';
+        const elHr = document.getElementById('metric-hr');
+        if (elHr) elHr.textContent = (Math.round(liveHr * 100) / 100) + '%';
 
         const statusBadge = document.getElementById('eval-status-badge');
         if (statusBadge) {
@@ -375,16 +405,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function updateMetricsUI(metrics, systemMetrics) {
         if (metrics) {
-            document.getElementById('metric-total-claims').textContent = metrics.total_klaim;
-            document.getElementById('metric-tp').textContent = metrics.tp;
-            document.getElementById('metric-fp').textContent = metrics.fp;
-            document.getElementById('metric-fn').textContent = metrics.fn;
-            document.getElementById('metric-precision').textContent = metrics.precision + '%';
-            document.getElementById('metric-recall').textContent = metrics.recall + '%';
-            document.getElementById('metric-f1').textContent = metrics.f1_score + '%';
+            const elTotalClaims = document.getElementById('metric-total-claims');
+            if (elTotalClaims) elTotalClaims.textContent = metrics.total_klaim;
+            const elTp = document.getElementById('metric-tp');
+            if (elTp) elTp.textContent = metrics.tp;
+            const elFp = document.getElementById('metric-fp');
+            if (elFp) elFp.textContent = metrics.fp;
+            const elFn = document.getElementById('metric-fn');
+            if (elFn) elFn.textContent = metrics.fn;
+            const elPrec = document.getElementById('metric-precision');
+            if (elPrec) elPrec.textContent = metrics.precision + '%';
+            const elRecall = document.getElementById('metric-recall');
+            if (elRecall) elRecall.textContent = metrics.recall + '%';
+            const elF1 = document.getElementById('metric-f1');
+            if (elF1) elF1.textContent = metrics.f1_score + '%';
         }
         if (systemMetrics) {
-            document.getElementById('metric-hr').textContent = systemMetrics.hallucination_rate + '%';
+            const elHr = document.getElementById('metric-hr');
+            if (elHr) elHr.textContent = systemMetrics.hallucination_rate + '%';
         }
     }
 
@@ -408,9 +446,11 @@ document.addEventListener('DOMContentLoaded', function () {
             if (val !== '') fnList.push(val);
         });
 
-        const originalText = btnSaveEvaluation.innerHTML;
-        btnSaveEvaluation.innerHTML = 'Menyimpan...';
-        btnSaveEvaluation.disabled = true;
+        const originalText = btnSaveEvaluation ? btnSaveEvaluation.innerHTML : '';
+        if (btnSaveEvaluation) {
+            btnSaveEvaluation.innerHTML = 'Menyimpan...';
+            btnSaveEvaluation.disabled = true;
+        }
 
         fetch('/rekomendasi/penilaian/store', {
             method: 'POST',
@@ -440,8 +480,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 const evalBannerReading = document.getElementById('eval-banner-reading');
                 if (evalBannerReading) {
                     const m = data.metrics;
-                    document.getElementById('eval-banner-text').innerHTML = 
-                        `✓ <strong>Rekomendasi ini telah diuji.</strong> F1-Score: <strong>${m.f1_score}%</strong> | Precision: <strong>${m.precision}%</strong> | Recall: <strong>${m.recall}%</strong> (Hallucination Rate: <strong>${data.system_metrics.hallucination_rate}%</strong>)`;
+                    const bannerText = document.getElementById('eval-banner-text');
+                    if (bannerText) {
+                        bannerText.innerHTML = 
+                            `✓ <strong>Rekomendasi ini telah diuji.</strong> F1-Score: <strong>${m.f1_score}%</strong> | Precision: <strong>${m.precision}%</strong> | Recall: <strong>${m.recall}%</strong> (Hallucination Rate: <strong>${data.system_metrics.hallucination_rate}%</strong>)`;
+                    }
                     evalBannerReading.style.display = 'flex';
                 }
             } else {
@@ -452,8 +495,10 @@ document.addEventListener('DOMContentLoaded', function () {
             alert('Koneksi gagal saat menyimpan penilaian.');
         })
         .finally(() => {
-            btnSaveEvaluation.innerHTML = originalText;
-            btnSaveEvaluation.disabled = false;
+            if (btnSaveEvaluation) {
+                btnSaveEvaluation.innerHTML = originalText;
+                btnSaveEvaluation.disabled = false;
+            }
         });
     }
 
@@ -502,14 +547,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (btnCloseModal) {
         btnCloseModal.addEventListener('click', function () {
-            modal.style.display = 'none';
+            if (modal) modal.style.display = 'none';
         });
     }
 
     window.addEventListener('click', function (e) {
-        if (e.target === modal) {
+        if (modal && e.target === modal) {
             modal.style.display = 'none';
         }
     });
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAiEvalScript);
+} else {
+    initAiEvalScript();
+}
 </script>

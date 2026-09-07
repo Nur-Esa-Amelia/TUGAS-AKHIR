@@ -18,7 +18,6 @@ class FileIsiBukti extends Model
         'keterangan',
     ];
 
-    //1 file isi bukti punya 1 pengisian bukti
     public function pengisianBukti()
     {
         return $this->belongsTo(PengisianBukti::class, 'id_pengisian_bukti');

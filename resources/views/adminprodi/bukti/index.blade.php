@@ -192,7 +192,7 @@
         // Set form action
         document.getElementById('formEdit').action = `/adminprodi/bukti/${id}`;
         
-        // Populate inputs
+        // inputan
         document.getElementById('edit_id_iku').value = id_iku;
         document.getElementById('edit_nama_bukti').value = nama_bukti;
         document.getElementById('edit_deskripsi').value = deskripsi;

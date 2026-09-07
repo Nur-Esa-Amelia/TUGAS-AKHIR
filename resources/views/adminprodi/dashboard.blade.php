@@ -336,211 +336,17 @@
     </div>
 </div>
 
-<!-- Custom AI Recommendation Modal -->
-<div id="custom-ai-modal" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(8px); align-items: center; justify-content: center; padding: 20px; transition: all 0.3s ease;">
-    <div style="background: var(--bg-surface); border: 1px solid var(--border); box-shadow: 0 0 30px rgba(168, 85, 247, 0.12); border-radius: 12px; width: 100%; max-width: 750px; max-height: 85vh; display: flex; flex-direction: column; animation: modalSlideIn 0.25s ease-out; overflow: hidden;">
-        <!-- Modal Header -->
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding: 16px 20px; background: var(--bg-surface);">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(168, 85, 247, 0.15); display: flex; align-items: center; justify-content: center; color: #a855f7;">
-                    <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 21l8.982-11.795H13.62l1.378-6.059L6 15.004h3.813z"></path>
-                    </svg>
-                </div>
-                <div>
-                    <h3 id="modal-title" style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin: 0;">Rekomendasi Analisis AI</h3>
-                    <p id="modal-subtitle" style="font-size: 0.75rem; color: var(--text-muted); margin: 2px 0 0 0;"></p>
-                </div>
-            </div>
-            <button id="btn-close-modal" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; transition: all 0.2s;">
-                <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
-        </div>
-        <!-- Modal Body -->
-        <div id="modal-body-content" style="color: var(--text-secondary); font-size: 0.875rem; line-height: 1.6; padding: 20px; overflow-y: auto; flex: 1; max-height: calc(85vh - 75px);">
-            <!-- Rendered markdown recommendation goes here -->
-        </div>
-    </div>
-</div>
-
-<style>
-@keyframes modalSlideIn {
-    from {
-        transform: scale(0.96) translateY(8px);
-        opacity: 0;
-    }
-        <div>
-            <div class="stat-header">
-                <div class="stat-info">
-                    <span class="stat-label">Belum Tercapai</span>
-                    <h4 class="stat-value" style="color: #ef4444;">{{ $unachievedCount }}</h4>
-                </div>
-                <div class="stat-icon belum-tercapai">
-                    <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                    </svg>
-                </div>
-            </div>
-        </div>
-        <div class="stat-footer">
-            <span class="stat-desc">Perlu didorong pengisian</span>
-            <span class="badge-custom badge-rose">Warning</span>
-        </div>
-    </div>
-</div>
-
-<!-- Balanced Scorecard (BSC) Averages -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 24px;">
-    <!-- Perspektif Mahasiswa -->
-    <div class="card" style="display: flex; align-items: center; gap: 20px; padding: 20px; position: relative; overflow: hidden; border-color: rgba(56, 189, 248, 0.15);">
-        <div style="position: relative; width: 76px; height: 76px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: conic-gradient({{ $avgMahasiswa >= 100 ? '#10b981' : ($avgMahasiswa >= 60 ? '#f59e0b' : '#ef4444') }} {{ $avgMahasiswa * 3.6 }}deg, var(--bg-surface2) 0deg); flex-shrink: 0; box-shadow: inset 0 0 8px rgba(0,0,0,0.12);">
-            <div style="content: ''; position: absolute; width: 60px; height: 60px; border-radius: 50%; background-color: var(--bg-surface);"></div>
-            <span style="position: relative; font-size: 1.1rem; font-weight: 800; color: var(--text-primary);">{{ $avgMahasiswa }}%</span>
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 4px;">
-            <h4 style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin: 0;">Perspektif Mahasiswa</h4>
-            <span class="badge-custom {{ $avgMahasiswa >= 100 ? 'badge-green' : ($avgMahasiswa >= 60 ? 'badge-blue' : 'badge-rose') }}" style="align-self: flex-start; font-size: 0.6rem; margin-top: 2px;">
-                {{ $avgMahasiswa >= 100 ? 'Sangat Baik' : ($avgMahasiswa >= 60 ? 'Cukup Baik' : 'Kurang/Risiko') }}
-            </span>
-        </div>
-    </div>
-
-    <!-- Perspektif Dosen -->
-    <div class="card" style="display: flex; align-items: center; gap: 20px; padding: 20px; position: relative; overflow: hidden; border-color: rgba(168, 85, 247, 0.15);">
-        <div style="position: relative; width: 76px; height: 76px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: conic-gradient({{ $avgDosen >= 100 ? '#10b981' : ($avgDosen >= 60 ? '#f59e0b' : '#ef4444') }} {{ $avgDosen * 3.6 }}deg, var(--bg-surface2) 0deg); flex-shrink: 0; box-shadow: inset 0 0 8px rgba(0,0,0,0.12);">
-            <div style="content: ''; position: absolute; width: 60px; height: 60px; border-radius: 50%; background-color: var(--bg-surface);"></div>
-            <span style="position: relative; font-size: 1.1rem; font-weight: 800; color: var(--text-primary);">{{ $avgDosen }}%</span>
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 4px;">
-            <h4 style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin: 0;">Perspektif Dosen</h4>
-            <span class="badge-custom {{ $avgDosen >= 100 ? 'badge-green' : ($avgDosen >= 60 ? 'badge-purple' : 'badge-rose') }}" style="align-self: flex-start; font-size: 0.6rem; margin-top: 2px;">
-                {{ $avgDosen >= 100 ? 'Sangat Baik' : ($avgDosen >= 60 ? 'Cukup Baik' : 'Kurang/Risiko') }}
-            </span>
-        </div>
-    </div>
-</div>
-
-    @if($recommendations && $recommendations->isNotEmpty())
-        <div class="alert-box alert-warning" style="background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.3); color: var(--text-secondary); display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 8px; margin-bottom: 24px;">
-            <svg style="width: 18px; height: 18px; color: #c084fc; flex-shrink: 0;" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 21l8.982-11.795H13.62l1.378-6.059L6 15.004h3.813z"></path>
-            </svg>
-            <div style="font-size: 0.85rem; color: var(--text-secondary);">
-                Terdeteksi <strong>{{ $recommendations->count() }}</strong> indikator dengan status warning. Klik tombol <strong>💡 Rekomendasi</strong> di kolom status tabel untuk melihat saran perbaikan AI.
-            </div>
-        </div>
-    @else
-        <div class="alert-box alert-success" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); color: var(--text-secondary); display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 8px; margin-bottom: 24px;">
-            <svg style="width: 18px; height: 18px; color: #10b981; flex-shrink: 0;" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <div style="font-size: 0.85rem; color: var(--text-secondary);">
-                Tidak ada rekomendasi karena seluruh indikator dalam kondisi aman.
-            </div>
-        </div>
-    @endif
-
-<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
-    <!-- IKU/IKT Capaian Table -->
-    <div class="card" style="display: flex; flex-direction: column; gap: 18px;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h3 style="font-size: 1.1rem; font-weight: 700;">Monitoring Capaian IKU/IKT ({{ $tahunAktif }})</h3>
-            <a href="{{ route('adminprodi.laporan.index') }}" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.75rem; border-radius: 8px;">Lihat Laporan Lengkap</a>
-        </div>
-
-        <div class="table-responsive">
-            <table class="table-custom">
-                <thead>
-                    <tr>
-                        <th>Indikator Kinerja Utama</th>
-                        <th style="text-align: center;">Target</th>
-                        <th style="text-align: center;">Realisasi (Valid)</th>
-                        <th style="text-align: center;">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($pencapaians as $item)
-                        <tr>
-                            <td>
-                                <div style="font-weight: 600; color: var(--text-primary);">{{ $item->iku->nama_iku }}</div>
-                                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Kategori: {{ $item->iku->kategori->nama_kategori }}</div>
-                            </td>
-                            <td style="text-align: center; font-weight: 600; color: var(--text-primary);">
-                                {{ $item->target }}{{ $item->satuan === 'persen' ? '%' : '' }} 
-                                <span style="font-size: 0.7rem; color: var(--text-muted); display: block; font-weight: normal;">({{ $item->objek }})</span>
-                            </td>
-                            <td style="text-align: center; font-weight: 700; color: var(--text-primary);">
-                                {{ round($item->realisasi) }} Bukti
-                            </td>
-                            <td style="text-align: center; vertical-align: middle;">
-                                @if($item->status === 'Tercapai')
-                                    <span class="badge-custom badge-green">Tercapai</span>
-                                @elseif($item->status === 'Perlu Perhatian')
-                                    <span class="badge-custom badge-yellow" style="background-color: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.2); color: #fbbf24; display: block; margin-bottom: 6px;">Perlu Perhatian</span>
-                                    <button type="button" class="btn-show-ai-rec" data-pencapaian-id="{{ $item->id }}" style="padding: 3px 8px; font-size: 0.72rem; border-radius: 6px; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); color: #c084fc; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s; outline: none;">
-                                        <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 21l8.982-11.795H13.62l1.378-6.059L6 15.004h3.813z"></path>
-                                        </svg>
-                                        Rekomendasi
-                                    </button>
-                                @else
-                                    <span class="badge-custom badge-rose" style="display: block; margin-bottom: 6px;">Tidak Tercapai</span>
-                                    <button type="button" class="btn-show-ai-rec" data-pencapaian-id="{{ $item->id }}" style="padding: 3px 8px; font-size: 0.72rem; border-radius: 6px; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); color: #c084fc; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s; outline: none;">
-                                        <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 21l8.982-11.795H13.62l1.378-6.059L6 15.004h3.813z"></path>
-                                        </svg>
-                                        Rekomendasi
-                                    </button>
-                                @endif
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="4" style="text-align: center; color: #64748b; padding: 30px;">
-                                Belum ada target IKU/IKT yang diatur untuk tahun akademik aktif ({{ $tahunAktif }}). Silakan tambahkan target di menu Target IKU/IKT Tahunan.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Recent Assignments -->
-    <div class="card" style="display: flex; flex-direction: column; gap: 18px;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h3 style="font-size: 1.1rem; font-weight: 700;">Penugasan Dosen Terbaru</h3>
-            <a href="{{ route('adminprodi.penugasan.index') }}" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.75rem; border-radius: 8px;">Kelola</a>
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 12px;">
-            @forelse($recentAssignments as $assign)
-                <div style="padding: 12px; background-color: var(--bg-surface2); border: 1px solid var(--border); border-radius: 8px; display: flex; flex-direction: column; gap: 4px;">
-                    <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary);">{{ $assign->user->name }}</div>
-                    <div style="font-size: 0.75rem; color: var(--text-secondary);">IKU/IKT: {{ $assign->iku->nama_iku }}</div>
-                    <div style="font-size: 0.7rem; color: var(--text-muted); align-self: flex-end; margin-top: 4px;">Tahun: {{ $assign->tahun }}</div>
-                </div>
-            @empty
-                <div style="text-align: center; color: #64748b; padding: 20px; font-size: 0.85rem;">
-                    Belum ada penugasan dosen untuk tahun {{ $tahunAktif }}.
-                </div>
-            @endforelse
-    </div>
-</div>
-
 @include('partials.ai_evaluation_modal')
 @include('partials.ai_evaluation_script')
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const recommendationsData = {!! json_encode($recommendations->keyBy('id_iku_pencapaian')) !!};
+function initAdminProdiDashboardRecs() {
+    const recommendationsData = {!! json_encode(($recommendations && $recommendations->isNotEmpty()) ? $recommendations->keyBy('id_iku_pencapaian') : (object)[]) !!};
 
     document.querySelectorAll('.btn-show-ai-rec').forEach(function (btn) {
         btn.addEventListener('click', function () {
             const pencapaianId = btn.getAttribute('data-pencapaian-id');
-            const data = recommendationsData[pencapaianId];
+            const data = recommendationsData ? recommendationsData[pencapaianId] : null;
             
             let textToShow = data ? data.rekomendasi : '';
             const metaData = (data && data.iku_pencapaian) ? {
@@ -571,13 +377,19 @@ document.addEventListener('DOMContentLoaded', function () {
                         } else {
                             recommendationsData[pencapaianId].rekomendasi = res.rekomendasi;
                         }
-                        openAiModal(res.rekomendasi, pencapaianId, metaData);
+                        if (typeof openAiModal === 'function') {
+                            openAiModal(res.rekomendasi, pencapaianId, metaData);
+                        }
                     } else {
-                        openAiModal('**Terjadi kesalahan** saat memproses rekomendasi.', pencapaianId, metaData);
+                        if (typeof openAiModal === 'function') {
+                            openAiModal('**Terjadi kesalahan** saat memproses rekomendasi.', pencapaianId, metaData);
+                        }
                     }
                 })
                 .catch(error => {
-                    openAiModal('**Koneksi gagal.** Silakan periksa jaringan Anda.', pencapaianId, metaData);
+                    if (typeof openAiModal === 'function') {
+                        openAiModal('**Koneksi gagal.** Silakan periksa jaringan Anda.', pencapaianId, metaData);
+                    }
                 })
                 .finally(() => {
                     btn.innerHTML = originalHtml;
@@ -585,10 +397,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     btn.style.pointerEvents = 'auto';
                 });
             } else {
-                openAiModal(textToShow, pencapaianId, metaData);
+                if (typeof openAiModal === 'function') {
+                    openAiModal(textToShow, pencapaianId, metaData);
+                }
             }
         });
     });
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAdminProdiDashboardRecs);
+} else {
+    initAdminProdiDashboardRecs();
+}
 </script>
 @endsection

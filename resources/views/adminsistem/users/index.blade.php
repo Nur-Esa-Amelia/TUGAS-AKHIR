@@ -289,6 +289,7 @@
 
 <script>
     function toggleProdi(role, groupId) {
+        //Program Studi disembunyikan dari p2mp
         const group = document.getElementById(groupId);
         if (role === 'admin_p2mp' || role === 'admin_sistem') {
             group.style.display = 'none';

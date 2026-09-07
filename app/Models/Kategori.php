@@ -16,7 +16,6 @@ class Kategori extends Model
         'deskripsi',
     ];
 
-    //1 kategori punya banyak iku.
     public function iku()
     {
         return $this->hasMany(Iku::class, 'id_kategori');

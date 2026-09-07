@@ -1417,7 +1417,7 @@
                 });
             }
 
-            // Sidebar dropdown toggle (Accordion style)
+            // mengatur dropdown
             const dropdownToggles = document.querySelectorAll('.sidebar-dropdown-toggle');
             dropdownToggles.forEach(toggle => {
                 const parent = toggle.closest('.sidebar-dropdown');
@@ -1775,7 +1775,7 @@
     </script>
 
     <script>
-        // Modal functions
+        // membuka modal berdasarkan ID
         function openModal(id) {
             const modal = document.getElementById(id);
             if (modal) {
@@ -1784,6 +1784,7 @@
             }
         }
 
+        //menutup modal
         function closeModal(id) {
             const modal = document.getElementById(id);
             if (modal) {
@@ -1792,14 +1793,14 @@
             }
         }
 
-        // Close modal when clicking outside
+        // menutup modal ketika pengguna mengklik bagian luar modal (overlay).
         document.addEventListener('click', function(event) {
             if (event.target.classList.contains('modal-overlay')) {
                 closeModal(event.target.id);
             }
         });
 
-        // Profile Dropdown Toggle
+        // dropdown profil
         const profileBtn = document.getElementById('profile-btn');
         const profileMenu = document.getElementById('profile-menu');
         
@@ -1816,7 +1817,7 @@
             });
         }
 
-        // Pengaturan Sistem Modal Logic
+        // modal “Pengaturan Sistem”
         async function openPengaturanModal(url) {
             const modal = document.getElementById('pengaturan-sistem-modal');
             const contentDiv = document.getElementById('pengaturan-modal-content');
@@ -1845,7 +1846,7 @@
             }
         }
 
-        // Helper to load new settings when changing prodi in the modal select
+        // memuat ulang data Pengaturan Sistem berdasarkan Program Studi (Prodi) yang dipilih
         function loadPengaturanModal(prodiId) {
             const baseUrl = "{{ route('adminprodi.pengaturan.index') }}";
             openPengaturanModal(`${baseUrl}?prodi_id=${prodiId}`);

@@ -140,17 +140,18 @@
         const ikuSelect = document.getElementById('id_iku');
         const buktiSelect = document.getElementById('id_bukti_iku');
         
-        // Cache all seeded options from server
+         // Menyimpan semua pilihan bukti yang tersedia dari server
         const originalBuktiOptions = Array.from(buktiSelect.querySelectorAll('option')).filter(opt => opt.value !== '');
         
+        // Memperbarui pilihan bukti berdasarkan IKU yang dipilih
         function updateBuktiOptions() {
             const selectedIkuId = ikuSelect.value;
             
-            // Clear current options except the placeholder
+             // Mengosongkan pilihan bukti sebelumnya
             buktiSelect.innerHTML = '<option value="">-- Pilih Jenis Bukti --</option>';
             
             if (selectedIkuId) {
-                // Filter matching options
+                // Memfilter bukti yang sesuai dengan IKU yang dipilih
                 const filtered = originalBuktiOptions.filter(opt => opt.getAttribute('data-iku-id') === selectedIkuId);
                 
                 if (filtered.length > 0) {
@@ -167,7 +168,7 @@
         
         ikuSelect.addEventListener('change', updateBuktiOptions);
         
-        // Initial setup for default values (preselected based on current or old data)
+        // Mengatur pilihan awal IKU dan jenis bukti
         if (ikuSelect.value) {
             updateBuktiOptions();
             const oldBuktiId = "{{ old('id_bukti_iku', $pengisian->id_bukti_iku) }}";
@@ -176,12 +177,13 @@
             }
         }
 
-        // Dynamic File Upload UI
+        // Mengatur fitur upload file secara dinamis
         const fileInputsContainer = document.getElementById('file-inputs-container');
         const addFileBtn = document.getElementById('add-file-btn');
         const existingFilesContainer = document.getElementById('existing-files-container');
         const deletedFilesInputs = document.getElementById('deleted-files-inputs');
 
+        // Memperbarui nomor urut setiap berkas baru
         function updateLabels() {
             const cards = fileInputsContainer.querySelectorAll('.file-input-card');
             cards.forEach((card, index) => {
@@ -192,6 +194,7 @@
             });
         }
 
+        // Mengatur tampilan keterangan file dan tombol tambah file
         function checkFileVisibility() {
             let hasFile = false;
             const cards = fileInputsContainer.querySelectorAll('.file-input-card');
@@ -219,14 +222,14 @@
             }
         }
 
-        // Handle change on file inputs
+        // Mengecek perubahan pada input file
         fileInputsContainer.addEventListener('change', (e) => {
             if (e.target.classList.contains('file-selector-input')) {
                 checkFileVisibility();
             }
         });
 
-        // Add file button click handler
+        // Menambahkan input file baru
         addFileBtn.addEventListener('click', () => {
             const nextIdx = fileInputsContainer.querySelectorAll('.file-input-card').length + 1;
             const newCard = document.createElement('div');
@@ -258,7 +261,7 @@
             updateLabels();
         });
 
-        // Remove new file row handler
+        // Menghapus input file baru
         fileInputsContainer.addEventListener('click', (e) => {
             const removeBtn = e.target.closest('.remove-file-btn');
             if (removeBtn) {
@@ -271,7 +274,7 @@
             }
         });
 
-        // Handle delete of existing files
+       // Menangani penghapusan file yang sudah tersimpan
         if (existingFilesContainer) {
             existingFilesContainer.addEventListener('click', (e) => {
                 const removeBtn = e.target.closest('.remove-existing-file-btn');
@@ -279,8 +282,9 @@
                     const fileId = removeBtn.getAttribute('data-file-id');
                     const card = document.getElementById('existing-file-' + fileId);
                     if (card) {
+                        // Menyembunyikan file yang akan dihapus
                         card.style.display = 'none';
-                        // Append hidden input for deleted files
+                        // Menyimpan ID file yang akan dihapus untuk diproses server
                         const hiddenInput = document.createElement('input');
                         hiddenInput.type = 'hidden';
                         hiddenInput.name = 'deleted_files[]';

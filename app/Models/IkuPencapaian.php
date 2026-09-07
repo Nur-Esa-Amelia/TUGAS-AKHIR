@@ -32,19 +32,16 @@ class IkuPencapaian extends Model
         'target' => 'float',
     ];
 
-    //1 iku pencapaian punya 1 iku
     public function iku()
     {
         return $this->belongsTo(Iku::class, 'id_iku');
     }
 
-    //1 iku pencapaian punya 1 prodi
     public function prodi()
     {
         return $this->belongsTo(Prodi::class, 'id_prodi');
     }
 
-    //1 iku pencapaian punya 1 user
     public function user()
     {
         return $this->belongsTo(User::class, 'id_user');

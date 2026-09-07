@@ -18,20 +18,16 @@ class GenerateAiRecommendationJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $timeout = 120;
+    public $timeout = 120; //minimal 2 mnt
     protected $ikuPencapaianId;
 
-    /**
-     * Create a new job instance.
-     */
+    //Create a new job instance.
     public function __construct($ikuPencapaianId)
     {
-        $this->ikuPencapaianId = $ikuPencapaianId;
+        $this->ikuPencapaianId = $ikuPencapaianId; //ID ini disimpan agar bisa digunakan saat Job menjalankan rekomendasi
     }
 
-    /**
-     * Execute the job.
-     */
+    //Execute the job.
     public function handle(): void
     {
         $item = IkuPencapaian::with(['iku', 'prodi'])->find($this->ikuPencapaianId);
@@ -52,7 +48,7 @@ class GenerateAiRecommendationJob implements ShouldQueue
 
         // Catat aktivitas jika ini dipicu (Opsional)
 
-        // prompt untuk AI
+        // ambil data acuan
         $prodiName = $item->prodi ? $item->prodi->nama_prodi : 'Program Studi'; 
         $tahun = $item->tahun; 
         $namaIku = $item->iku ? $item->iku->nama_iku : 'Indikator'; 
@@ -121,7 +117,7 @@ class GenerateAiRecommendationJob implements ShouldQueue
                 $prompt .= "- (Belum ada bukti yang diunggah)\n";
             } else {
                 foreach ($sudahDiunggah as $s) {
-                    $prompt .= $s . "\n";
+                    $prompt .= $s . "\n"; //masukkan data ygdi unggah ke prompt
                 }
             }
             $prompt .= "\n**Bukti yang Belum Diunggah:**\n";
@@ -129,7 +125,7 @@ class GenerateAiRecommendationJob implements ShouldQueue
                 $prompt .= "- (Semua jenis bukti wajib sudah memiliki unggahan)\n";
             } else {
                 foreach ($belumDiunggah as $b) {
-                    $prompt .= $b . "\n";
+                    $prompt .= $b . "\n"; //Memasukkan nama dan informasi bukti yang belum diunggah ke prompt.
                 }
             }
             $prompt .= "\n";
@@ -160,11 +156,11 @@ class GenerateAiRecommendationJob implements ShouldQueue
             ->where(function($q) {
                 $q->whereNull('cooldown_until')->orWhere('cooldown_until', '<', now());
             })
-            // null last_used_at comes first (never used), then ordered by oldest used
+            // Mengurutkan model yang belum pernah digunakan
             ->orderByRaw('last_used_at IS NULL DESC, last_used_at ASC')
             ->get();
 
-        if ($activeModels->isEmpty()) {
+        if ($activeModels->isEmpty()) { //apakah model ksg
             $activeModels = \App\Models\GeminiModel::where('status', 'aktif')
                 ->orderByRaw('last_used_at IS NULL DESC, last_used_at ASC')
                 ->get();
@@ -173,14 +169,15 @@ class GenerateAiRecommendationJob implements ShouldQueue
         $success = false;
 
         foreach ($activeModels as $activeModel) {
-            $apiKey = $activeModel->api_key;
+            $apiKey = $activeModel->api_key; //smbil api key
             $model = $activeModel->model_id;
 
             try {
                 $response = Http::timeout(30)->post(
+                    //alamat endpoint Gemini API.
                     'https://generativelanguage.googleapis.com/v1beta/models/' . $model . ':generateContent?key=' . $apiKey,
                     [
-                        'contents' => [
+                        'contents' => [ //strktr dt yg di kirim
                             [
                                  'parts' => [
                                      [

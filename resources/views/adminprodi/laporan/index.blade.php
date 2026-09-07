@@ -298,13 +298,14 @@
 @include('partials.ai_evaluation_script')
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const recommendationsData = {!! json_encode($recommendations->keyBy('id_iku_pencapaian')) !!};
+function initAdminProdiLaporanRecs() {
+    const recommendationsData = {!! json_encode(($recommendations && $recommendations->isNotEmpty()) ? $recommendations->keyBy('id_iku_pencapaian') : (object)[]) !!};
 
+    ////menentukan tombol rekomendasi AI mana yang diklik
     document.querySelectorAll('.btn-show-ai-rec').forEach(function (btn) {
         btn.addEventListener('click', function () {
             const pencapaianId = btn.getAttribute('data-pencapaian-id');
-            const data = recommendationsData[pencapaianId];
+            const data = recommendationsData ? recommendationsData[pencapaianId] : null;
             
             let textToShow = data ? data.rekomendasi : '';
             const metaData = (data && data.iku_pencapaian) ? {
@@ -320,6 +321,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 btn.style.opacity = '0.7';
                 btn.style.pointerEvents = 'none';
 
+                ////membuat/generate rekomendasi AI
                 fetch('/rekomendasi/generate-ajax/' + pencapaianId, {
                     method: 'POST',
                     headers: {
@@ -335,13 +337,19 @@ document.addEventListener('DOMContentLoaded', function () {
                         } else {
                             recommendationsData[pencapaianId].rekomendasi = res.rekomendasi;
                         }
-                        openAiModal(res.rekomendasi, pencapaianId, metaData);
+                        if (typeof openAiModal === 'function') {
+                            openAiModal(res.rekomendasi, pencapaianId, metaData);
+                        }
                     } else {
-                        openAiModal('**Terjadi kesalahan** saat memproses rekomendasi.', pencapaianId, metaData);
+                        if (typeof openAiModal === 'function') {
+                            openAiModal('**Terjadi kesalahan** saat memproses rekomendasi.', pencapaianId, metaData);
+                        }
                     }
                 })
                 .catch(error => {
-                    openAiModal('**Koneksi gagal.** Silakan periksa jaringan Anda.', pencapaianId, metaData);
+                    if (typeof openAiModal === 'function') {
+                        openAiModal('**Koneksi gagal.** Silakan periksa jaringan Anda.', pencapaianId, metaData);
+                    }
                 })
                 .finally(() => {
                     btn.innerHTML = originalHtml;
@@ -349,18 +357,26 @@ document.addEventListener('DOMContentLoaded', function () {
                     btn.style.pointerEvents = 'auto';
                 });
             } else {
-                openAiModal(textToShow, pencapaianId, metaData);
+                if (typeof openAiModal === 'function') {
+                    openAiModal(textToShow, pencapaianId, metaData);
+                }
             }
         });
     });
 
-    // Close export dropdown when clicking outside
+    // menutup dropdown export mengklik di luar area
     window.addEventListener('click', function(e) {
         const menu = document.getElementById('export-menu');
         if (menu && menu.style.display === 'block' && !e.target.closest('.dropdown-export')) {
             menu.style.display = 'none';
         }
     });
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAdminProdiLaporanRecs);
+} else {
+    initAdminProdiLaporanRecs();
+}
 </script>
 @endsection

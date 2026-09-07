@@ -21,25 +21,21 @@ class PengisianBukti extends Model
         'catatan_validator',
     ];
 
-    //Satu pengisian bukti hanya terkait dengan satu IKU.
     public function iku()
     {
         return $this->belongsTo(Iku::class, 'id_iku');
     }
 
-    //Satu pengisian bukti hanya terkait dengan satu jenis bukti iku.
     public function buktiIku()
     {
         return $this->belongsTo(BuktiIku::class, 'id_bukti_iku');
     }
 
-    //Satu pengisian bukti hanya terkait dengan satu user (dosen).
     public function user()
     {
         return $this->belongsTo(User::class, 'id_user');
     }
 
-    //Satu pengisian bukti bisa memiliki banyak file.
     public function files()
     {
         return $this->hasMany(FileIsiBukti::class, 'id_pengisian_bukti');

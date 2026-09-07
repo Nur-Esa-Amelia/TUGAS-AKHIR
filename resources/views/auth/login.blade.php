@@ -412,10 +412,11 @@
                             Ingat saya
                         </label>
                     </div>
-                    <!-- <a href="#" onclick="alert('Silakan hubungi administrator P2MP untuk menyetel ulang kata sandi Anda.')" class="text-sm text-cyan-400 hover:text-cyan-300 transition" style="text-decoration: none; font-weight: 500;">
-                        Lupa kata sandi?
-                    </a> -->
+                    <a href="{{ route('password.request') }}" class="text-sm transition" style="text-decoration: none; font-weight: 500; font-size: 0.85rem; color: #0284c7;">
+                        Lupa Password?
+                    </a>
                 </div>
+
 
                 <!-- Submit Button -->
                 <button type="submit" class="btn-login-submit">
@@ -433,18 +434,23 @@
     document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.setAttribute('data-theme', 'dark');
 
+         // Mengambil elemen input password dan tombol tampilkan password
         const passwordInput = document.getElementById('password');
         const passwordToggle = document.getElementById('password-toggle');
         const eyeOpenIcon = document.getElementById('eye-open');
         const eyeClosedIcon = document.getElementById('eye-closed');
 
         if (passwordInput && passwordToggle) {
+             // Mengatur tampilan password saat tombol diklik
+        passwordToggle.addEventListener('click', () => {
             passwordToggle.addEventListener('click', () => {
                 if (passwordInput.type === 'password') {
+                    // Menampilkan password dalam bentuk teks
                     passwordInput.type = 'text';
                     eyeOpenIcon.classList.add('hidden');
                     eyeClosedIcon.classList.remove('hidden');
                 } else {
+                    // Menyembunyikan password kembali
                     passwordInput.type = 'password';
                     eyeOpenIcon.classList.remove('hidden');
                     eyeClosedIcon.classList.add('hidden');

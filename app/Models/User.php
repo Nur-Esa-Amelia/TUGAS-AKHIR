@@ -30,11 +30,20 @@ class User extends Authenticatable
         ];
     }
 
-    /**
-     * 1 uswer 1 prodi
-     */
     public function prodi()
     {
         return $this->belongsTo(Prodi::class, 'prodi_id');
     }
+
+    /**
+     * Kirim notifikasi reset password khusus.
+     *
+     * @param  string  $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new \App\Notifications\ResetPasswordNotification($token));
+    }
 }
+

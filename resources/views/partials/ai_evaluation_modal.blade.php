@@ -107,10 +107,9 @@
                                 <span style="font-size: 0.68rem; color: var(--text-muted); display: block;">F1-Score</span>
                                 <strong id="metric-f1" style="font-size: 1.1rem; color: #ec4899;">0%</strong>
                             </div>
-                            <div style="background: var(--bg-surface); padding: 10px; border-radius: 8px; border: 1px solid var(--border); text-align: center;" title="Tingkat halusinasi kumulatif dari seluruh rekomendasi yang diuji di sistem">
+                            <div style="background: var(--bg-surface); padding: 10px; border-radius: 8px; border: 1px solid var(--border); text-align: center;" title="Persentase klaim halusinasi dari seluruh klaim AI yang dievaluasi (FP / Total Klaim AI)">
                                 <span style="font-size: 0.65rem; color: var(--text-muted); display: block;">Hallucination Rate</span>
                                 <strong id="metric-hr" style="font-size: 1.1rem; color: #f43f5e;">0%</strong>
-                                <span style="font-size: 0.6rem; color: var(--text-muted); display: block;">(Level Sistem)</span>
                             </div>
                         </div>
                     </div>

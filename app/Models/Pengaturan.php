@@ -21,13 +21,11 @@ class Pengaturan extends Model
         'jml_dosen',
     ];
 
-    //1 pengaturan hanya terkait dengan 1 prodi.
     public function prodi()
     {
         return $this->belongsTo(Prodi::class, 'id_prodi');
     }
 
-    //1 pengaturan hanya terkait dengan 1 user.
     public function user()
     {
         return $this->belongsTo(User::class, 'id_user');

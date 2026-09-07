@@ -17,13 +17,11 @@ class BuktiIku extends Model
         'deskripsi',
     ];
 
-    //1 bukti iku punya 1 iku.
     public function iku()
     {
         return $this->belongsTo(Iku::class, 'id_iku');
     }
 
-    //1 bukti iku bisa punya banyak pengisian bukti.
     public function pengisianBukti()
     {
         return $this->hasMany(PengisianBukti::class, 'id_bukti_iku');

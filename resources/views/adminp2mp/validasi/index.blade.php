@@ -258,6 +258,7 @@
 </div>
 
 <script>
+    //membuka/menutup form validasi sesuai ID data dan mereset input penolakan saat form ditutup.
     function toggleValidationForm(id) {
         const form = document.getElementById('status-form-' + id);
         const display = document.getElementById('status-display-' + id);
@@ -271,6 +272,7 @@
         }
     }
 
+    //menampilkan form/input alasan penolakan
     function showRejectInput(id) {
         document.getElementById('form-reject-' + id).style.display = 'block';
         document.getElementById('btn-reject-trigger-' + id).style.display = 'none';
@@ -281,6 +283,8 @@
         document.getElementById('btn-reject-trigger-' + id).style.display = 'block';
     }
 
+    //mengumpulkan ID bukti yang menunggu validasi, mengecek apakah ada, 
+    // lalu menampilkan modal untuk menyetujui semua bukti tersebut sekaligus.
     function showBulkApproveModal() {
         const pendingIds = [];
         const rows = document.querySelectorAll('tbody tr');

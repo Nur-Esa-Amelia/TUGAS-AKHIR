@@ -189,6 +189,7 @@
     </style>
 
     <script>
+        //buka/tutup detail suatu data pada tabel
         function toggleDetail(id) {
             const row = document.getElementById('detail-row-' + id);
             const chevron = document.getElementById('chevron-' + id);

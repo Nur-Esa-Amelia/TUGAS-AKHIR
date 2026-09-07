@@ -16,17 +16,13 @@ class EwsWarningMail extends Mailable implements ShouldQueue
 
     public $pencapaian;
 
-    /**
-     * Create a new message instance.
-     */
+    //Menerima data pencapaian
     public function __construct(IkuPencapaian $pencapaian)
     {
         $this->pencapaian = $pencapaian;
     }
 
-    /**
-     * Get the message envelope.
-     */
+    //menentukan judul/subjek email EWS.
     public function envelope(): Envelope
     {
         $prodiName = $this->pencapaian->prodi ? $this->pencapaian->prodi->nama_prodi : 'Program Studi';

@@ -13,7 +13,6 @@ class Prodi extends Model
         'nama_prodi',
     ];
 
-    //1 prodi punya banyak user
     public function users()
     {
         return $this->hasMany(User::class);

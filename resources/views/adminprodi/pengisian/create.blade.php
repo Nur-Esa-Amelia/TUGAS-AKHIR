@@ -113,13 +113,14 @@
         const ikuSelect = document.getElementById('id_iku');
         const buktiSelect = document.getElementById('id_bukti_iku');
         
-        // Cache all seeded options from server
+        // Menyimpan semua pilihan bukti yang tersedia dari server
         const originalBuktiOptions = Array.from(buktiSelect.querySelectorAll('option')).filter(opt => opt.value !== '');
         
+         // Memperbarui pilihan bukti berdasarkan IKU yang dipilih
         function updateBuktiOptions() {
             const selectedIkuId = ikuSelect.value;
             
-            // Clear current options except the placeholder
+            // Mengosongkan pilihan bukti sebelumnya
             buktiSelect.innerHTML = '<option value="">-- Pilih Jenis Bukti --</option>';
             
             if (selectedIkuId) {
@@ -140,7 +141,7 @@
         
         ikuSelect.addEventListener('change', updateBuktiOptions);
         
-        // Initial setup for default values (preselected on error redirect or dashboard shortcut)
+        // Mengatur nilai awal IKU dan jenis bukti
         if (ikuSelect.value) {
             updateBuktiOptions();
             const oldBuktiId = "{{ old('id_bukti_iku') }}";
@@ -149,10 +150,11 @@
             }
         }
 
-        // Dynamic File Upload UI
+        // Mengatur tampilan upload file secara dinamis
         const fileInputsContainer = document.getElementById('file-inputs-container');
         const addFileBtn = document.getElementById('add-file-btn');
 
+        // Memperbarui nomor urut setiap berkas
         function updateLabels() {
             const cards = fileInputsContainer.querySelectorAll('.file-input-card');
             cards.forEach((card, index) => {
@@ -163,6 +165,7 @@
             });
         }
 
+        // Mengatur tampilan keterangan file dan tombol tambah file
         function checkFileVisibility() {
             let hasFile = false;
             const cards = fileInputsContainer.querySelectorAll('.file-input-card');
@@ -190,14 +193,14 @@
             }
         }
 
-        // Handle change on file inputs
+        // Menangani perubahan pada input file
         fileInputsContainer.addEventListener('change', (e) => {
             if (e.target.classList.contains('file-selector-input')) {
                 checkFileVisibility();
             }
         });
 
-        // Add file button click handler
+        // Menambahkan input file baru
         addFileBtn.addEventListener('click', () => {
             const nextIdx = fileInputsContainer.querySelectorAll('.file-input-card').length + 1;
             const newCard = document.createElement('div');
@@ -229,7 +232,7 @@
             updateLabels();
         });
 
-        // Remove file row handler
+        // Menghapus input file
         fileInputsContainer.addEventListener('click', (e) => {
             const removeBtn = e.target.closest('.remove-file-btn');
             if (removeBtn) {
@@ -242,7 +245,7 @@
             }
         });
 
-        // Run check initial visibility
+       // Mengecek kondisi awal tampilan file
         checkFileVisibility();
     });
 </script>

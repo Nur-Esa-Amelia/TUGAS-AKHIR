@@ -1400,24 +1400,26 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Mobile menu toggle
+              // Mengatur menu sidebar pada tampilan mobile
             const mobileMenuBtn = document.getElementById('mobile-menu-btn');
             const sidebar = document.getElementById('sidebar');
             const sidebarOverlay = document.getElementById('sidebar-overlay');
 
             if (mobileMenuBtn && sidebar && sidebarOverlay) {
+                 // Membuka atau menutup sidebar saat tombol menu diklik
                 mobileMenuBtn.addEventListener('click', () => {
                     sidebar.classList.toggle('open');
                     sidebarOverlay.classList.toggle('open');
                 });
 
+                   // Menutup sidebar saat area luar sidebar diklik
                 sidebarOverlay.addEventListener('click', () => {
                     sidebar.classList.remove('open');
                     sidebarOverlay.classList.remove('open');
                 });
             }
 
-            // Sidebar dropdown toggle (Accordion style)
+               // Mengatur dropdown sidebar dengan gaya accordion
             const dropdownToggles = document.querySelectorAll('.sidebar-dropdown-toggle');
             dropdownToggles.forEach(toggle => {
                 const parent = toggle.closest('.sidebar-dropdown');
@@ -1426,10 +1428,11 @@
                     toggle.classList.add('open');
                 }
 
+                // Menandai dropdown yang sedang terbuka
                 toggle.addEventListener('click', () => {
                     const isOpen = toggle.classList.contains('open');
                     
-                    // Close all other dropdowns
+                      // Menutup dropdown lainnya
                     dropdownToggles.forEach(otherToggle => {
                         if (otherToggle !== toggle) {
                             otherToggle.classList.remove('open');
@@ -1439,7 +1442,7 @@
                         }
                     });
 
-                    // Toggle current dropdown
+                   // Membuka atau menutup dropdown yang dipilih
                     if (isOpen) {
                         toggle.classList.remove('open');
                         menu.classList.remove('show');
@@ -1456,20 +1459,22 @@
                 form.addEventListener('submit', async function(e) {
                     e.preventDefault();
                     
+                    // Menonaktifkan tombol submit selama proses penyimpanan
                     const submitBtn = form.querySelector('button[type="submit"]');
                     const originalBtnText = submitBtn.innerHTML;
                     submitBtn.innerHTML = 'Menyimpan...';
                     submitBtn.disabled = true;
 
-                    // Remove existing error messages
+                     // Menghapus pesan error sebelumnya
                     form.querySelectorAll('.form-error-custom').forEach(el => el.remove());
                     form.querySelectorAll('.form-input-custom, .form-select-custom').forEach(el => {
                         el.style.borderColor = 'var(--input-border)';
                     });
 
-                    try {
+                    try {  // Mengambil data dari form
                         const formData = new FormData(form);
                         const method = form.getAttribute('method').toUpperCase();
+                        // Menentukan pengaturan request AJAX
                         let fetchOptions = {
                             method: method === 'GET' ? 'GET' : 'POST',
                             headers: {
@@ -1482,11 +1487,13 @@
                             fetchOptions.body = formData;
                         }
                         
+                        // Mengirim data form ke server
                         const response = await fetch(form.getAttribute('action'), fetchOptions);
                         
                         if (response.ok) {
                             window.location.reload();
                         } else if (response.status === 422) {
+                             // Menampilkan pesan validasi jika data tidak sesuai
                             const data = await response.json();
                             const errors = data.errors;
                             
@@ -1758,18 +1765,19 @@
             }
         }
 
-        // Close modal when clicking outside
+        // Menutup modal saat area di luar modal diklik
         document.addEventListener('click', function(event) {
             if (event.target.classList.contains('modal-overlay')) {
                 closeModal(event.target.id);
             }
         });
 
-        // Profile Dropdown Toggle
+        // Mengatur dropdown profil pengguna
         const profileBtn = document.getElementById('profile-btn');
         const profileMenu = document.getElementById('profile-menu');
         
         if(profileBtn && profileMenu) {
+            // Membuka atau menutup menu profil saat tombol diklik
             profileBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 profileMenu.style.display = profileMenu.style.display === 'none' || profileMenu.style.display === '' ? 'block' : 'none';
@@ -1782,7 +1790,7 @@
             });
         }
 
-        // Pengaturan Sistem Modal Logic
+        // Mengatur modal Pengaturan Sistem
         async function openPengaturanModal(url) {
             const modal = document.getElementById('pengaturan-sistem-modal');
             const contentDiv = document.getElementById('pengaturan-modal-content');
@@ -1811,7 +1819,7 @@
             }
         }
 
-        // Helper to load new settings when changing prodi in the modal select
+        // Memuat pengaturan berdasarkan Program Studi yang dipilih
         function loadPengaturanModal(prodiId) {
             const baseUrl = "{{ route('adminprodi.pengaturan.index') }}";
             openPengaturanModal(`${baseUrl}?prodi_id=${prodiId}`);

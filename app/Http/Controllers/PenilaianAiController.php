@@ -128,10 +128,13 @@ class PenilaianAiController extends Controller
                 }
             }
 
-            // 4. Hitung Hallucination Rate Keseluruhan (Level Sistem)
+            // 4. Hitung Hallucination Rate Keseluruhan (Berbasis Klaim: FP / Total Klaim AI * 100)
+            $totalTp = (int) PenilaianRekomendasiAi::sum('tp');
+            $totalFp = (int) PenilaianRekomendasiAi::sum('fp');
+            $totalClaimsAi = $totalTp + $totalFp;
+            $systemHallucinationRate = $totalClaimsAi > 0 ? round(($totalFp / $totalClaimsAi) * 100, 2) : 0;
             $totalEvaluated = PenilaianRekomendasiAi::count();
             $totalHallucinated = PenilaianRekomendasiAi::where('has_hallucination', true)->count();
-            $systemHallucinationRate = $totalEvaluated > 0 ? round(($totalHallucinated / $totalEvaluated) * 100, 2) : 0;
 
             return response()->json([
                 'status' => 'success',
@@ -144,6 +147,8 @@ class PenilaianAiController extends Controller
                 'system_metrics' => [
                     'total_evaluated' => $totalEvaluated,
                     'total_hallucinated' => $totalHallucinated,
+                    'total_claims_ai' => $totalClaimsAi,
+                    'total_fp' => $totalFp,
                     'hallucination_rate' => $systemHallucinationRate,
                 ]
             ]);
@@ -176,7 +181,7 @@ class PenilaianAiController extends Controller
             $pencapaian = IkuPencapaian::findOrFail($request->pencapaian_id);
             $rekomendasi = RekomendasiAi::where('id_iku_pencapaian', $pencapaian->id)->firstOrFail();
 
-            $claims = $request->claims;
+            $claims = $request->claims; //ambil daftar klaim AI
             $fnRaw = $request->fn_list ?? [];
             $fnList = array_filter(array_map('trim', $fnRaw), fn($val) => !empty($val));
 
@@ -234,10 +239,13 @@ class PenilaianAiController extends Controller
                 ]);
             }
 
-            // Hitung Ulang Hallucination Rate Tingkat Sistem
+            // Hitung Ulang Hallucination Rate Keseluruhan (Berbasis Klaim: FP / Total Klaim AI * 100)
+            $totalTp = (int) PenilaianRekomendasiAi::sum('tp');
+            $totalFp = (int) PenilaianRekomendasiAi::sum('fp');
+            $totalClaimsAi = $totalTp + $totalFp;
+            $systemHallucinationRate = $totalClaimsAi > 0 ? round(($totalFp / $totalClaimsAi) * 100, 2) : 0;
             $totalEvaluated = PenilaianRekomendasiAi::count();
             $totalHallucinated = PenilaianRekomendasiAi::where('has_hallucination', true)->count();
-            $systemHallucinationRate = $totalEvaluated > 0 ? round(($totalHallucinated / $totalEvaluated) * 100, 2) : 0;
 
             ActivityLog::log('Menilai rekomendasi AI', 'Pengujian AI', "Melakukan pengujian AI untuk IKU ID {$pencapaian->id_iku} (F1: {$f1Score}%, Precision: {$precision}%, Recall: {$recall}%)");
 
@@ -257,6 +265,8 @@ class PenilaianAiController extends Controller
                 'system_metrics' => [
                     'total_evaluated' => $totalEvaluated,
                     'total_hallucinated' => $totalHallucinated,
+                    'total_claims_ai' => $totalClaimsAi,
+                    'total_fp' => $totalFp,
                     'hallucination_rate' => $systemHallucinationRate,
                 ]
             ]);
@@ -273,7 +283,7 @@ class PenilaianAiController extends Controller
      * @param string $text
      * @return array
      */
-    private function extractClaimsFromMarkdown($text)
+    private function extractClaimsFromMarkdown($text) //memecah klaim
     {
         if (empty($text)) {
             return [];
@@ -285,7 +295,7 @@ class PenilaianAiController extends Controller
 
         foreach ($lines as $line) {
             $trimmed = trim($line);
-            if (empty($trimmed)) continue;
+            if (empty($trimmed)) continue; //brs ksg 
             // Abaikan garis judul header utama
             if (preg_match('/^#+\s+/', $trimmed)) continue;
 
