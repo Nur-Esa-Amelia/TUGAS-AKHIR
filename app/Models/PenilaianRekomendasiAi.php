@@ -13,22 +13,9 @@ class PenilaianRekomendasiAi extends Model
 
     protected $fillable = [
         'id_rekomendasi_ai',
-        'id_user',
-        'total_klaim',
-        'tp',
-        'fp',
-        'fn',
-        'precision',
-        'recall',
-        'f1_score',
-        'has_hallucination',
-    ];
-
-    protected $casts = [
-        'precision' => 'float',
-        'recall' => 'float',
-        'f1_score' => 'float',
-        'has_hallucination' => 'boolean',
+        'nama_penilai',
+        'jabatan',
+        'prodi_unit',
     ];
 
     public function rekomendasiAi()
@@ -36,18 +23,9 @@ class PenilaianRekomendasiAi extends Model
         return $this->belongsTo(RekomendasiAi::class, 'id_rekomendasi_ai');
     }
 
-    public function user()
+    public function details()
     {
-        return $this->belongsTo(User::class, 'id_user');
-    }
-
-    public function klaimList()
-    {
-        return $this->hasMany(PenilaianKlaimAi::class, 'id_penilaian');
-    }
-
-    public function fnList()
-    {
-        return $this->hasMany(PenilaianFnAi::class, 'id_penilaian');
+        return $this->hasMany(DetailPenilaianRekomendasi::class, 'id_penilaian');
     }
 }
+

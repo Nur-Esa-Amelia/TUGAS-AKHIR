@@ -11,34 +11,31 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Hapus tabel lama jika ada
+        Schema::dropIfExists('penilaian_fn_ai');
+        Schema::dropIfExists('penilaian_klaim_ai');
+        Schema::dropIfExists('detail_penilaian_rekomendasi');
+        Schema::dropIfExists('penilaian_rekomendasi_ai');
+
+        // Tabel Penilaian Expert (Header)
         Schema::create('penilaian_rekomendasi_ai', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_rekomendasi_ai')->constrained('rekomendasi_ai')->onDelete('cascade');
-            $table->foreignId('id_user')->constrained('users')->onDelete('cascade');
-            $table->integer('total_klaim')->default(0);
-            $table->integer('tp')->default(0);
-            $table->integer('fp')->default(0);
-            $table->integer('fn')->default(0);
-            $table->float('precision', 8, 2)->default(0);
-            $table->float('recall', 8, 2)->default(0);
-            $table->float('f1_score', 8, 2)->default(0);
-            $table->boolean('has_hallucination')->default(false);
+            $table->string('nama_penilai');
+            $table->string('jabatan');
+            $table->string('prodi_unit');
             $table->timestamps();
         });
 
-        Schema::create('penilaian_klaim_ai', function (Blueprint $table) {
+        // Tabel Detail Penilaian Per Klaim
+        Schema::create('detail_penilaian_rekomendasi', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_penilaian')->constrained('penilaian_rekomendasi_ai')->onDelete('cascade');
-            $table->string('nomor_klaim');
-            $table->text('teks_klaim');
-            $table->enum('status_penilaian', ['faktual', 'halusinasi'])->default('faktual');
-            $table->timestamps();
-        });
-
-        Schema::create('penilaian_fn_ai', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('id_penilaian')->constrained('penilaian_rekomendasi_ai')->onDelete('cascade');
-            $table->text('fakta_terlewat');
+            $table->foreignId('id_iku')->nullable()->constrained('iku')->onDelete('set null');
+            $table->text('klaim');
+            $table->float('persentase_fakta', 8, 2)->default(0);
+            $table->float('persentase_halusinasi', 8, 2)->default(0);
+            $table->text('catatan')->nullable();
             $table->timestamps();
         });
     }
@@ -50,6 +47,9 @@ return new class extends Migration
     {
         Schema::dropIfExists('penilaian_fn_ai');
         Schema::dropIfExists('penilaian_klaim_ai');
+        Schema::dropIfExists('detail_penilaian_rekomendasi');
         Schema::dropIfExists('penilaian_rekomendasi_ai');
     }
 };
+
+

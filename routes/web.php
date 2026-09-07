@@ -31,6 +31,11 @@ Route::get('/test-gemini', function () {
     return $response->json();
 });
 
+// Rute Publik Penilaian Expert (TIDAK MEMERLUKAN LOGIN / Google Form Style)
+Route::get('/evaluasi-expert', [\App\Http\Controllers\PenilaianExpertController::class, 'index'])->name('evaluasi-expert.index');
+Route::get('/evaluasi-expert/rekomendasi/{id}', [\App\Http\Controllers\PenilaianExpertController::class, 'getRekomendasiData'])->name('evaluasi-expert.rekomendasi');
+Route::post('/evaluasi-expert/store', [\App\Http\Controllers\PenilaianExpertController::class, 'store'])->name('evaluasi-expert.store');
+
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
@@ -82,6 +87,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/validasi-bulk-approve', [\App\Http\Controllers\AdminP2mp\BulkApproveController::class, 'bulkApprove'])->name('validasi.bulk-approve');
         Route::get('/monitoring', [AdminP2mpDashboardController::class, 'monitoring'])->name('monitoring');
         Route::get('/monitoring/export-excel', [AdminP2mpDashboardController::class, 'exportExcel'])->name('monitoring.export-excel');
+        Route::get('/hasil-evaluasi', [\App\Http\Controllers\AdminSistem\HasilEvaluasiController::class, 'index'])->name('hasil-evaluasi.index');
     });
 
     // Rute Admin Sistem
@@ -97,6 +103,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/model-ai/{id}', [AdminSistemModelTokenAiController::class, 'destroy'])->name('model_ai.destroy');
         Route::post('/model-ai/{id}/activate', [AdminSistemModelTokenAiController::class, 'activate'])->name('model_ai.activate');
         Route::get('/aktivitas', [\App\Http\Controllers\AdminSistem\ActivityLogController::class, 'index'])->name('aktivitas.index');
+        Route::get('/hasil-evaluasi', [\App\Http\Controllers\AdminSistem\HasilEvaluasiController::class, 'index'])->name('hasil-evaluasi.index');
     });
 
     // Rute yang dapat diakses oleh Admin Prodi, Kaprodi & Admin P2MP
@@ -150,8 +157,5 @@ Route::middleware('auth')->group(function () {
     
     // AJAX Endpoint for Generating Recommendation
     Route::post('/rekomendasi/generate-ajax/{id}', [\App\Http\Controllers\RekomendasiAiController::class, 'generateAjax'])->name('rekomendasi.generate-ajax');
-    
-    // AJAX Endpoints for AI Recommendation Testing / Evaluation
-    Route::get('/rekomendasi/penilaian/{pencapaianId}', [\App\Http\Controllers\PenilaianAiController::class, 'getPenilaianData'])->name('rekomendasi.penilaian.get');
-    Route::post('/rekomendasi/penilaian/store', [\App\Http\Controllers\PenilaianAiController::class, 'storePenilaian'])->name('rekomendasi.penilaian.store');
 });
+

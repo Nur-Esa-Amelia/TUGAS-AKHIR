@@ -23,6 +23,7 @@ class RekomendasiAi extends Model
 
     public function penilaian()
     {
-        return $this->hasOne(PenilaianRekomendasiAi::class, 'id_rekomendasi_ai');
+        return $this->hasMany(PenilaianRekomendasiAi::class, 'id_rekomendasi_ai');
     }
+
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" data-theme="dark">
+<html lang="id" data-theme="light">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -22,10 +22,11 @@
     <!-- Apply theme immediately before paint to prevent flash -->
     <script>
         (function() {
-            var theme = localStorage.getItem('theme') || 'dark';
+            var theme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', theme);
         })();
     </script>
+
 
     <style>
         /* ==================== THEME VARIABLES ==================== */
