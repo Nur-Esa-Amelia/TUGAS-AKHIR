@@ -381,7 +381,7 @@
 
                     <div class="form-group">
                         <label class="form-label" for="jabatan">Jabatan <span class="req">*</span></label>
-                        <input type="text" id="jabatan" class="form-input" placeholder="Contoh: Dosen Senior / Validator Internal" required>
+                        <input type="text" id="jabatan" class="form-input" placeholder="Contoh: Dosen Teknik Komputer" required>
                     </div>
 
                     <div class="form-group">
