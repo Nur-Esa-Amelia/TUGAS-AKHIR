@@ -27,6 +27,11 @@ class PenilaianExpertController extends Controller
             ->where('rekomendasi', 'NOT LIKE', '%Gagal menghubungi server%')
             ->get();
 
+        // Ambil daftar Program Studi unik yang memang memiliki rekomendasi AI / IKU tersedia
+        $prodiList = $rekomendasiList->map(function ($item) {
+            return $item->ikuPencapaian->prodi ?? null;
+        })->filter()->unique('id')->values();
+
         // Opsi IKU untuk dropdown
         $ikuOptions = $rekomendasiList->map(function ($item) {
             $iku = $item->ikuPencapaian->iku ?? null;
@@ -36,12 +41,29 @@ class PenilaianExpertController extends Controller
                 'id_iku' => $iku ? $iku->id : null,
                 'kode_iku' => $iku ? ($iku->kode_iku ?: 'IKU') : 'IKU',
                 'nama_iku' => $iku ? $iku->nama_iku : 'Indikator Kinerja',
+                'id_prodi' => $prodi ? $prodi->id : null,
                 'nama_prodi' => $prodi ? $prodi->nama_prodi : 'Umum',
                 'tahun' => $item->ikuPencapaian->tahun ?? date('Y'),
             ];
         });
 
-        return view('evaluasi_expert.index', compact('ikuOptions'));
+        return view('evaluasi_expert.index', compact('ikuOptions', 'prodiList'));
+    }
+
+    /**
+     * Helper untuk membersihkan header faktual legacy dari teks rekomendasi AI.
+     *
+     * @param string $text
+     * @return string
+     */
+    public static function stripFactualHeader($text)
+    {
+        if (empty($text)) {
+            return '';
+        }
+        $pattern = '/^(?:###\s+[^\n]*\n+)?(?:-\s+\*\*(?:Nama IKU\/IKT|Program Studi|Tahun Akademik|Target|Realisasi|Status)\*\*:[^\n]*\n+)+/i';
+        $cleaned = preg_replace($pattern, '', trim($text));
+        return trim($cleaned);
     }
 
     /**
@@ -57,17 +79,25 @@ class PenilaianExpertController extends Controller
                 ->findOrFail($rekomendasiId);
 
             $pencapaian = $rekomendasi->ikuPencapaian;
-            $claims = $this->extractClaimsFromMarkdown($rekomendasi->rekomendasi);
+            $rekomendasiTeks = self::stripFactualHeader($rekomendasi->rekomendasi);
+            $claims = $this->extractClaimsFromMarkdown($rekomendasiTeks);
+
+            $targetFormatted = $pencapaian ? ($pencapaian->target . ($pencapaian->satuan === 'persen' ? '%' : '') . ($pencapaian->objek ? " ({$pencapaian->objek})" : '')) : '-';
+            $realisasiFormatted = $pencapaian ? (round($pencapaian->realisasi) . ' Bukti') : '-';
 
             return response()->json([
                 'status' => 'success',
                 'rekomendasi_id' => $rekomendasi->id,
-                'iku_id' => $pencapaian->iku ? $pencapaian->iku->id : null,
-                'nama_iku' => $pencapaian->iku ? $pencapaian->iku->nama_iku : 'Indikator Kinerja',
-                'kode_iku' => $pencapaian->iku ? ($pencapaian->iku->kode_iku ?: '-') : '-',
-                'prodi' => $pencapaian->prodi ? $pencapaian->prodi->nama_prodi : '-',
-                'tahun' => $pencapaian->tahun,
-                'rekomendasi_teks' => $rekomendasi->rekomendasi,
+                'iku_id' => $pencapaian && $pencapaian->iku ? $pencapaian->iku->id : null,
+                'nama_iku' => $pencapaian && $pencapaian->iku ? $pencapaian->iku->nama_iku : 'Indikator Kinerja',
+                'kode_iku' => $pencapaian && $pencapaian->iku ? ($pencapaian->iku->kode_iku ?: '-') : '-',
+                'deskripsi_iku' => $pencapaian && $pencapaian->iku ? ($pencapaian->iku->deskripsi ?: 'Tidak ada deskripsi indikator kinerja.') : '-',
+                'prodi' => $pencapaian && $pencapaian->prodi ? $pencapaian->prodi->nama_prodi : '-',
+                'tahun' => $pencapaian ? $pencapaian->tahun : '-',
+                'target' => $targetFormatted,
+                'realisasi' => $realisasiFormatted,
+                'status_capaian' => $pencapaian ? $pencapaian->status : '-',
+                'rekomendasi_teks' => $rekomendasiTeks,
                 'claims' => $claims,
             ]);
 

@@ -80,6 +80,11 @@ class UserController extends Controller
 
         ActivityLog::log('Menambah data', 'Kelola User', 'Menambahkan user baru: ' . $newUser->name);
 
+        if ($request->ajax() || $request->wantsJson()) {
+            session()->flash('success', 'User berhasil ditambahkan.');
+            return response()->json(['status' => 'success', 'message' => 'User berhasil ditambahkan.']);
+        }
+
         return redirect()->route('adminsistem.users.index')
             ->with('success', 'User berhasil ditambahkan.');
     }
@@ -115,6 +120,11 @@ class UserController extends Controller
         $user->save();
 
         ActivityLog::log('Mengubah data', 'Kelola User', 'Mengubah data user: ' . $user->name);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            session()->flash('success', 'User berhasil diperbarui.');
+            return response()->json(['status' => 'success', 'message' => 'User berhasil diperbarui.']);
+        }
 
         return redirect()->route('adminsistem.users.index')
             ->with('success', 'User berhasil diperbarui.');

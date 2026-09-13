@@ -10,19 +10,12 @@ class ProfileController extends Controller
 {
     public function edit()
     {
-        $user = auth()->user();
-        if ($user->role === 'admin_p2mp') {
-            $layout = 'adminp2mp.layouts.app';
-        } elseif ($user->role === 'admin_prodi' || $user->role === 'kaprodi') {
-            $layout = 'adminprodi.layouts.app';
-        } else {
-            $layout = 'dosen.layouts.app';
+        $previousUrl = url()->previous();
+        if ($previousUrl && $previousUrl !== request()->url()) {
+            return redirect()->back()->with('open_profile_modal', true);
         }
 
-        return view('profile', [
-            'layout' => $layout,
-            'user' => $user
-        ]);
+        return redirect()->route('dashboard', ['open_profile' => 1]);
     }
 
     public function update(Request $request)

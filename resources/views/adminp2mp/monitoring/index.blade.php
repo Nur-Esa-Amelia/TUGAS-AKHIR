@@ -305,6 +305,11 @@ function initAdminP2mpMonitoringRecs() {
             let textToShow = data ? data.rekomendasi : '';
             const metaData = (data && data.iku_pencapaian) ? {
                 nama_iku: data.iku_pencapaian.iku ? data.iku_pencapaian.iku.nama_iku : 'Indikator Kinerja',
+                deskripsi_iku: data.iku_pencapaian.iku ? (data.iku_pencapaian.iku.deskripsi || 'Tidak ada deskripsi indikator kinerja.') : 'Tidak ada deskripsi indikator kinerja.',
+                prodi: data.iku_pencapaian.prodi ? data.iku_pencapaian.prodi.nama_prodi : '-',
+                tahun: data.iku_pencapaian.tahun || '-',
+                target_formatted: data.iku_pencapaian.target + (data.iku_pencapaian.satuan === 'persen' ? '%' : '') + (data.iku_pencapaian.objek ? ' (' + data.iku_pencapaian.objek + ')' : ''),
+                realisasi_formatted: Math.round(data.iku_pencapaian.realisasi) + ' Bukti',
                 status: data.iku_pencapaian.status,
                 realisasi: data.iku_pencapaian.realisasi,
                 target: data.iku_pencapaian.target

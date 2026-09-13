@@ -120,6 +120,11 @@ class IkuPencapaianController extends Controller
         $iku = Iku::find($request->id_iku);
         ActivityLog::log('Menambah IKU/IKT', 'Target Pencapaian', 'Menginput target IKU/IKT: ' . ($iku ? $iku->nama_iku : $request->id_iku));
 
+        if ($request->ajax() || $request->wantsJson()) {
+            session()->flash('success', 'Target IKU/IKT berhasil ditambahkan.');
+            return response()->json(['status' => 'success', 'message' => 'Target IKU/IKT berhasil ditambahkan.']);
+        }
+
         return redirect()->route('adminprodi.pencapaian.index', ['tahun' => $request->tahun])->with('success', 'Target IKU/IKT berhasil ditambahkan.');
     }
 
@@ -170,6 +175,11 @@ class IkuPencapaianController extends Controller
 
         $iku = Iku::find($pencapaian->id_iku);
         ActivityLog::log('Mengubah IKU/IKT', 'Target Pencapaian', 'Mengubah target IKU/IKT: ' . ($iku ? $iku->nama_iku : ''));
+
+        if ($request->ajax() || $request->wantsJson()) {
+            session()->flash('success', 'Target IKU/IKT berhasil diperbarui.');
+            return response()->json(['status' => 'success', 'message' => 'Target IKU/IKT berhasil diperbarui.']);
+        }
 
         return redirect()->route('adminprodi.pencapaian.index', ['tahun' => $pencapaian->tahun])->with('success', 'Target IKU/IKT berhasil diperbarui.');
     }

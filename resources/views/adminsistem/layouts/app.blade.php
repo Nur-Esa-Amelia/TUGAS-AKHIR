@@ -1492,11 +1492,24 @@
                         const response = await fetch(form.getAttribute('action'), fetchOptions);
                         
                         if (response.ok) {
+                            document.querySelectorAll('.modal-overlay.show, .modal.show').forEach(m => {
+                                m.classList.remove('show');
+                                m.style.display = 'none';
+                            });
+                            document.body.style.overflow = '';
                             window.location.reload();
-                        } else if (response.status === 422) {
-                             // Menampilkan pesan validasi jika data tidak sesuai
-                            const data = await response.json();
-                            const errors = data.errors;
+                            return;
+                        }
+                        
+                        let data = {};
+                        try {
+                            data = await response.json();
+                        } catch (jsonErr) {
+                            data = { message: 'Terjadi kesalahan pada server (Status ' + response.status + ').' };
+                        }
+
+                        if (response.status === 422) {
+                            const errors = data.errors || {};
                             
                             for (const field in errors) {
                                 const input = form.querySelector(`[name="${field}"]`);
@@ -1504,12 +1517,15 @@
                                     input.style.borderColor = '#ef4444';
                                     const errorDiv = document.createElement('div');
                                     errorDiv.className = 'form-error-custom';
-                                    errorDiv.innerText = errors[field][0];
+                                    errorDiv.style.color = '#ef4444';
+                                    errorDiv.style.fontSize = '0.75rem';
+                                    errorDiv.style.marginTop = '4px';
+                                    errorDiv.innerText = Array.isArray(errors[field]) ? errors[field][0] : errors[field];
                                     input.parentNode.appendChild(errorDiv);
                                 }
                             }
                         } else {
-                            alert('Terjadi kesalahan pada server.');
+                            alert(data.message || 'Terjadi kesalahan pada server.');
                         }
                     } catch (error) {
                         console.error('Error:', error);
@@ -1642,7 +1658,7 @@
                         
                         <!-- Dropdown Menu -->
                         <div id="profile-menu" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 8px; width: 160px; background: white; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); overflow: hidden; z-index: 100;">
-                            <a href="{{ route('profile') }}" style="display: block; padding: 12px 16px; color: #1e293b; text-decoration: none; font-size: 0.9rem; border-bottom: 1px solid #f1f5f9; transition: background 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+                            <a href="javascript:void(0)" onclick="openProfileModal()" style="display: block; padding: 12px 16px; color: #1e293b; text-decoration: none; font-size: 0.9rem; border-bottom: 1px solid #f1f5f9; transition: background 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
                                 Profil
                             </a>
                             <form action="{{ route('logout') }}" method="POST" style="margin: 0;" onsubmit="return confirm('Apakah Anda yakin ingin keluar dari sistem?')">
@@ -1884,6 +1900,7 @@
             </div>
         </div>
     </div>
+    @include('partials.profile_modal')
 </body>
 </html>
 

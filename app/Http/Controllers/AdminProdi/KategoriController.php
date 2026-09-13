@@ -40,6 +40,11 @@ class KategoriController extends Controller
 
         ActivityLog::log('Menambah data', 'Kategori IKU/IKT', 'Menambahkan kategori: ' . $kategori->nama_kategori);
 
+        if ($request->ajax() || $request->wantsJson()) {
+            session()->flash('success', 'Kategori berhasil ditambahkan.');
+            return response()->json(['status' => 'success', 'message' => 'Kategori berhasil ditambahkan.']);
+        }
+
         return redirect()->route('adminprodi.kategori.index')->with('success', 'Kategori berhasil ditambahkan.');
     }
 
@@ -58,6 +63,11 @@ class KategoriController extends Controller
         $kategori->update($request->all());
 
         ActivityLog::log('Mengubah data', 'Kategori IKU/IKT', 'Mengubah kategori: ' . $kategori->nama_kategori);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            session()->flash('success', 'Kategori berhasil diperbarui.');
+            return response()->json(['status' => 'success', 'message' => 'Kategori berhasil diperbarui.']);
+        }
 
         return redirect()->route('adminprodi.kategori.index')->with('success', 'Kategori berhasil diperbarui.');
     }

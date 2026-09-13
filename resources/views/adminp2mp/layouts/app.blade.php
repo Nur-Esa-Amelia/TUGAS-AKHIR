@@ -1486,10 +1486,24 @@
                         const response = await fetch(form.getAttribute('action'), fetchOptions);
                         
                         if (response.ok) {
+                            document.querySelectorAll('.modal-overlay.show, .modal.show').forEach(m => {
+                                m.classList.remove('show');
+                                m.style.display = 'none';
+                            });
+                            document.body.style.overflow = '';
                             window.location.reload();
-                        } else if (response.status === 422) {
-                            const data = await response.json();
-                            const errors = data.errors;
+                            return;
+                        }
+                        
+                        let data = {};
+                        try {
+                            data = await response.json();
+                        } catch (jsonErr) {
+                            data = { message: 'Terjadi kesalahan pada server (Status ' + response.status + ').' };
+                        }
+
+                        if (response.status === 422) {
+                            const errors = data.errors || {};
                             
                             for (const field in errors) {
                                 const input = form.querySelector(`[name="${field}"]`);
@@ -1497,12 +1511,15 @@
                                     input.style.borderColor = '#ef4444';
                                     const errorDiv = document.createElement('div');
                                     errorDiv.className = 'form-error-custom';
-                                    errorDiv.innerText = errors[field][0];
+                                    errorDiv.style.color = '#ef4444';
+                                    errorDiv.style.fontSize = '0.75rem';
+                                    errorDiv.style.marginTop = '4px';
+                                    errorDiv.innerText = Array.isArray(errors[field]) ? errors[field][0] : errors[field];
                                     input.parentNode.appendChild(errorDiv);
                                 }
                             }
                         } else {
-                            alert('Terjadi kesalahan pada server.');
+                            alert(data.message || 'Terjadi kesalahan pada server.');
                         }
                     } catch (error) {
                         console.error('Error:', error);
@@ -1604,10 +1621,6 @@
                             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                             Monitor & Laporan
                         </a>
-                        <a href="{{ route('adminp2mp.hasil-evaluasi.index') }}" class="dropdown-link {{ request()->routeIs('adminp2mp.hasil-evaluasi.*') ? 'active' : '' }}">
-                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                            Hasil Evaluasi AI
-                        </a>
                         <a href="{{ route('adminprodi.pengaturan.index') }}" class="dropdown-link {{ request()->routeIs('adminprodi.pengaturan.*') ? 'active' : '' }}">
                             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                             Pengaturan Sistem
@@ -1664,7 +1677,7 @@
                         
                         <!-- Dropdown Menu -->
                         <div id="profile-menu" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 8px; width: 160px; background: white; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); overflow: hidden; z-index: 100;">
-                            <a href="{{ route('profile') }}" style="display: block; padding: 12px 16px; color: #1e293b; text-decoration: none; font-size: 0.9rem; border-bottom: 1px solid #f1f5f9; transition: background 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+                            <a href="javascript:void(0)" onclick="openProfileModal()" style="display: block; padding: 12px 16px; color: #1e293b; text-decoration: none; font-size: 0.9rem; border-bottom: 1px solid #f1f5f9; transition: background 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
                                 Profil
                             </a>
                             <form action="{{ route('logout') }}" method="POST" style="margin: 0;" onsubmit="return confirm('Apakah Anda yakin ingin keluar dari sistem?')">
@@ -1906,6 +1919,6 @@
             </div>
         </div>
     </div>
+    @include('partials.profile_modal')
 </body>
 </html>
-

@@ -43,6 +43,11 @@ class ProdiController extends Controller
 
         ActivityLog::log('Menambah data', 'Kelola Program Studi', 'Menambahkan program studi: ' . $newProdi->nama_prodi);
 
+        if ($request->ajax() || $request->wantsJson()) {
+            session()->flash('success', 'Program Studi berhasil ditambahkan.');
+            return response()->json(['status' => 'success', 'message' => 'Program Studi berhasil ditambahkan.']);
+        }
+
         return redirect()->route('adminsistem.prodi.index')
             ->with('success', 'Program Studi berhasil ditambahkan.');
     }
@@ -62,6 +67,11 @@ class ProdiController extends Controller
         $prodi->update($validated);
 
         ActivityLog::log('Mengubah data', 'Kelola Program Studi', 'Mengubah data program studi: ' . $prodi->nama_prodi);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            session()->flash('success', 'Program Studi berhasil diperbarui.');
+            return response()->json(['status' => 'success', 'message' => 'Program Studi berhasil diperbarui.']);
+        }
 
         return redirect()->route('adminsistem.prodi.index')
             ->with('success', 'Program Studi berhasil diperbarui.');

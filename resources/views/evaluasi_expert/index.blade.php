@@ -371,7 +371,7 @@
                         <svg style="width: 20px; height: 20px; color: #818cf8;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                         </svg>
-                        Identitas Penilai / Expert
+                        Identitas Penilai
                     </h3>
 
                     <div class="form-group">
@@ -390,38 +390,99 @@
                     </div>
                 </div>
 
-                <!-- 2. Pilih IKU & Teks Rekomendasi -->
+                <!-- 2. Pilih Program Studi & Indikator Kinerja Utama (IKU) -->
                 <div class="form-card">
                     <h3 class="form-card-title">
                         <svg style="width: 20px; height: 20px; color: #818cf8;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V9a2 2 0 012-2h2a2 2 0 012 2v12"></path>
                         </svg>
-                        Pilih Indikator Kinerja Utama (IKU)
+                        Pilih Program Studi & Indikator Kinerja Utama (IKU)
                     </h3>
 
+                    <!-- Dropdown Program Studi yang Memiliki Rekomendasi AI -->
+                    <div class="form-group">
+                        <label class="form-label" for="select-prodi">Pilih Program Studi yang Ingin Dinilai <span class="req">*</span></label>
+                        <select id="select-prodi" class="form-select" required>
+                            <option value="">-- Pilih Program Studi --</option>
+                            @if(isset($prodiList) && count($prodiList) > 0)
+                                @foreach($prodiList as $prodi)
+                                    <option value="{{ $prodi->id }}" {{ (strcasecmp($prodi->nama_prodi, 'Teknik Komputer') === 0 || $loop->first) ? 'selected' : '' }}>
+                                        {{ $prodi->nama_prodi }}
+                                    </option>
+                                @endforeach
+                            @endif
+                        </select>
+                    </div>
+
+                    <!-- Dropdown IKU (Filtered based on Selected Prodi) -->
                     <div class="form-group">
                         <label class="form-label" for="select-iku">Pilih IKU yang Ingin Dinilai <span class="req">*</span></label>
                         <select id="select-iku" class="form-select" required>
                             <option value="">-- Pilih Indikator Kinerja --</option>
-                            @foreach($ikuOptions as $opt)
-                                <option value="{{ $opt['id_rekomendasi'] }}">
-                                    [{{ $opt['kode_iku'] }}] {{ $opt['nama_iku'] }} - Prodi: {{ $opt['nama_prodi'] }} (Tahun {{ $opt['tahun'] }})
-                                </option>
-                            @endforeach
                         </select>
-                    </div>
-
-                    <!-- Recommendation Display Area (Loaded via AJAX) -->
-                    <div id="rec-preview-container" style="display: none; flex-direction: column; gap: 8px;">
-                        <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>Teks Lengkap Rekomendasi AI:</span>
-                            <span id="rec-iku-tag" style="font-size: 0.72rem; color: #818cf8; font-weight: 700;"></span>
-                        </label>
-                        <div id="rec-body-text" class="rec-display-box"></div>
                     </div>
                 </div>
 
-                <!-- 3. Penilaian Per Klaim Individual -->
+                <!-- 3. Data Faktual Capaian IKU/IKT (Muncul otomatis setelah IKU dipilih) -->
+                <div id="iku-detail-card" class="form-card" style="display: none;">
+                    <h3 class="form-card-title">
+                        <svg style="width: 20px; height: 20px; color: #818cf8;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Data Faktual Capaian IKU/IKT
+                    </h3>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; background-color: var(--bg-surface2); padding: 14px 16px; border-radius: 10px; border: 1px solid var(--border);">
+                        <div>
+                            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; display: block;">Kode IKU</span>
+                            <strong id="detail-kode-iku" style="font-size: 0.9rem; color: var(--primary);"> - </strong>
+                        </div>
+                        <div>
+                            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; display: block;">Nama IKU</span>
+                            <strong id="detail-nama-iku" style="font-size: 0.9rem; color: var(--text-primary);"> - </strong>
+                        </div>
+                        <div>
+                            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; display: block;">Program Studi</span>
+                            <strong id="detail-prodi-iku" style="font-size: 0.9rem; color: var(--text-primary);"> - </strong>
+                        </div>
+                        <div>
+                            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; display: block;">Tahun Akademik</span>
+                            <strong id="detail-tahun-iku" style="font-size: 0.9rem; color: var(--text-primary);"> - </strong>
+                        </div>
+                        <div>
+                            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; display: block;">Target</span>
+                            <strong id="detail-target-iku" style="font-size: 0.9rem; color: var(--text-primary);"> - </strong>
+                        </div>
+                        <div>
+                            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; display: block;">Realisasi</span>
+                            <strong id="detail-realisasi-iku" style="font-size: 0.9rem; color: #3b82f6;"> - </strong>
+                        </div>
+                        <div>
+                            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; display: block;">Status Capaian</span>
+                            <strong id="detail-status-iku" style="font-size: 0.9rem;"> - </strong>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 4px;">
+                        <label class="form-label">Deskripsi IKU/IKT:</label>
+                        <div id="detail-deskripsi-iku" class="rec-display-box" style="max-height: 160px; background-color: var(--bg-surface2); font-style: normal; line-height: 1.6;">
+                            <!-- Populated via AJAX -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Hasil Rekomendasi AI -->
+                <div id="rec-preview-card" class="form-card" style="display: none;">
+                    <h3 class="form-card-title">
+                        <svg style="width: 20px; height: 20px; color: #a855f7;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 21l8.982-11.795H13.62l1.378-6.059L6 15.004h3.813z"></path>
+                        </svg>
+                        Rekomendasi AI
+                    </h3>
+                    <div id="rec-body-text" class="rec-display-box"></div>
+                </div>
+
+                <!-- 5. Penilaian Per Klaim Individual -->
                 <div id="claims-card-section" class="form-card" style="display: none;">
                     <h3 class="form-card-title">
                         <svg style="width: 20px; height: 20px; color: #10b981;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -456,10 +517,22 @@
     <!-- Script Markdown Parser & Form Handler -->
     <script>
     document.addEventListener('DOMContentLoaded', function () {
+        const selectProdi = document.getElementById('select-prodi');
         const selectIku = document.getElementById('select-iku');
-        const recPreviewContainer = document.getElementById('rec-preview-container');
-        const recIkuTag = document.getElementById('rec-iku-tag');
+        
+        const ikuDetailCard = document.getElementById('iku-detail-card');
+        const detailKodeIku = document.getElementById('detail-kode-iku');
+        const detailNamaIku = document.getElementById('detail-nama-iku');
+        const detailProdiIku = document.getElementById('detail-prodi-iku');
+        const detailTahunIku = document.getElementById('detail-tahun-iku');
+        const detailTargetIku = document.getElementById('detail-target-iku');
+        const detailRealisasiIku = document.getElementById('detail-realisasi-iku');
+        const detailStatusIku = document.getElementById('detail-status-iku');
+        const detailDeskripsiIku = document.getElementById('detail-deskripsi-iku');
+
+        const recPreviewCard = document.getElementById('rec-preview-card');
         const recBodyText = document.getElementById('rec-body-text');
+
         const claimsCardSection = document.getElementById('claims-card-section');
         const claimsListWrapper = document.getElementById('claims-list-wrapper');
         const submitSection = document.getElementById('submit-section');
@@ -467,6 +540,7 @@
         const expertForm = document.getElementById('expert-eval-form');
         const successContainer = document.getElementById('success-container');
 
+        const allIkuOptions = @json($ikuOptions ?? []);
         let currentClaimsData = [];
 
         function parseSimpleMarkdown(text) {
@@ -480,17 +554,55 @@
             return html.replace(/\n/g, '<br>');
         }
 
+        function hideDownstreamCards() {
+            if (ikuDetailCard) ikuDetailCard.style.display = 'none';
+            if (recPreviewCard) recPreviewCard.style.display = 'none';
+            if (claimsCardSection) claimsCardSection.style.display = 'none';
+            if (submitSection) submitSection.style.display = 'none';
+        }
+
+        // Filter IKU dropdown based on selected prodi
+        function filterIkuByProdi(prodiId) {
+            selectIku.innerHTML = '<option value="">-- Pilih Indikator Kinerja --</option>';
+            hideDownstreamCards();
+
+            if (!prodiId) return;
+
+            const filtered = allIkuOptions.filter(opt => opt.id_prodi == prodiId);
+            filtered.forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt.id_rekomendasi;
+                option.textContent = `[${opt.kode_iku}] ${opt.nama_iku} (Tahun ${opt.tahun})`;
+                selectIku.appendChild(option);
+            });
+        }
+
+        // Handle Prodi Selection Change
+        selectProdi.addEventListener('change', function () {
+            filterIkuByProdi(this.value);
+        });
+
+        // Handle IKU Selection Change
         selectIku.addEventListener('change', function () {
             const recId = this.value;
             if (!recId) {
-                recPreviewContainer.style.display = 'none';
-                claimsCardSection.style.display = 'none';
-                submitSection.style.display = 'none';
+                hideDownstreamCards();
                 return;
             }
 
+            // Reset loading state
+            detailKodeIku.textContent = '...';
+            detailNamaIku.textContent = '...';
+            detailProdiIku.textContent = '...';
+            detailTahunIku.textContent = '...';
+            if (detailTargetIku) detailTargetIku.textContent = '...';
+            if (detailRealisasiIku) detailRealisasiIku.textContent = '...';
+            if (detailStatusIku) detailStatusIku.textContent = '...';
+            detailDeskripsiIku.textContent = 'Memuat deskripsi IKU...';
             recBodyText.innerHTML = '<span style="color: var(--text-muted);">Memuat rekomendasi AI...</span>';
-            recPreviewContainer.style.display = 'flex';
+
+            ikuDetailCard.style.display = 'flex';
+            recPreviewCard.style.display = 'flex';
             claimsCardSection.style.display = 'none';
             submitSection.style.display = 'none';
 
@@ -498,9 +610,26 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        recIkuTag.textContent = `${data.kode_iku} - ${data.prodi} (${data.tahun})`;
+                        // Populate Data Faktual Capaian IKU/IKT Card
+                        detailKodeIku.textContent = data.kode_iku || '-';
+                        detailNamaIku.textContent = data.nama_iku || '-';
+                        detailProdiIku.textContent = data.prodi || '-';
+                        detailTahunIku.textContent = data.tahun || '-';
+                        if (detailTargetIku) detailTargetIku.textContent = data.target || '-';
+                        if (detailRealisasiIku) detailRealisasiIku.textContent = data.realisasi || '-';
+                        if (detailStatusIku) {
+                            const st = data.status_capaian || '-';
+                            let badgeColor = '#10b981';
+                            if (st === 'Perlu Perhatian') badgeColor = '#f59e0b';
+                            else if (st === 'Tidak Tercapai') badgeColor = '#ef4444';
+                            detailStatusIku.innerHTML = `<span style="color: ${badgeColor}; font-weight: 700;">${st}</span>`;
+                        }
+                        detailDeskripsiIku.innerHTML = data.deskripsi_iku ? parseSimpleMarkdown(data.deskripsi_iku) : 'Tidak ada deskripsi indikator kinerja.';
+
+                        // Populate Rekomendasi AI Card
                         recBodyText.innerHTML = parseSimpleMarkdown(data.rekomendasi_teks);
 
+                        // Render Claims & Show Evaluation Section
                         currentClaimsData = data.claims || [];
                         renderClaimsForm(currentClaimsData);
 
@@ -508,13 +637,20 @@
                         submitSection.style.display = 'block';
                     } else {
                         alert(data.message || 'Gagal memuat rekomendasi.');
+                        hideDownstreamCards();
                     }
                 })
                 .catch(err => {
                     console.error(err);
                     alert('Koneksi gagal saat mengambil data rekomendasi.');
+                    hideDownstreamCards();
                 });
         });
+
+        // Auto-filter IKU dropdown on initial load if Prodi is pre-selected (e.g., Teknik Komputer)
+        if (selectProdi.value) {
+            filterIkuByProdi(selectProdi.value);
+        }
 
         function renderClaimsForm(claims) {
             claimsListWrapper.innerHTML = '';

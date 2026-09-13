@@ -3,8 +3,13 @@ function initAiEvalScript() {
     const modal = document.getElementById('custom-ai-modal');
     const modalTitle = document.getElementById('modal-title');
     const modalSubtitle = document.getElementById('modal-subtitle');
-    const modalBody = document.getElementById('modal-body-content');
     const btnCloseModal = document.getElementById('btn-close-modal');
+
+    // Helper to strip legacy factual header text from recommendation text if present
+    function stripFactualHeaderJS(text) {
+        if (!text) return '';
+        return text.replace(/^(?:###\s+[^\n]*\n+)?(?:-\s+\*\*(?:Nama IKU\/IKT|Program Studi|Tahun Akademik|Target|Realisasi|Status)\*\*:[^\n]*\n+)+/gi, '').trim();
+    }
 
     // Helper Markdown Parser
     function parseMarkdown(text) {
@@ -57,15 +62,39 @@ function initAiEvalScript() {
     // Global Modal Trigger Function
     window.openAiModal = function (text, pencapaianId, metaData) {
         const ikuName = (metaData && metaData.nama_iku) ? metaData.nama_iku : 'Indikator Kinerja';
-        const statusHtml = metaData ? 
-            'Status: <span style="font-weight: 600; color: ' + 
-            (metaData.status === 'Perlu Perhatian' ? '#fbbf24' : '#ef4444') + ';">' + 
-            metaData.status + '</span> (Realisasi: ' + Math.round(metaData.realisasi) + ' dari Target: ' + metaData.target + ')'
-            : 'Detail Rekomendasi AI';
 
-        if (modalTitle) modalTitle.textContent = 'Rekomendasi Analisis AI: ' + ikuName;
-        if (modalSubtitle) modalSubtitle.innerHTML = statusHtml;
-        if (modalBody) modalBody.innerHTML = parseMarkdown(text);
+        if (modalTitle) modalTitle.textContent = 'Detail Rekomendasi AI: ' + ikuName;
+        if (modalSubtitle) modalSubtitle.textContent = 'Analisis Risiko & Saran Perbaikan Capaian IKU/IKT';
+
+        // Populate Section 1: Data Faktual Capaian IKU/IKT
+        if (metaData) {
+            const elNama = document.getElementById('modal-factual-nama');
+            const elProdi = document.getElementById('modal-factual-prodi');
+            const elTahun = document.getElementById('modal-factual-tahun');
+            const elTarget = document.getElementById('modal-factual-target');
+            const elRealisasi = document.getElementById('modal-factual-realisasi');
+            const elStatus = document.getElementById('modal-factual-status');
+            const elDeskripsi = document.getElementById('modal-factual-deskripsi');
+
+            if (elNama) elNama.textContent = metaData.nama_iku || '-';
+            if (elProdi) elProdi.textContent = metaData.prodi || '-';
+            if (elTahun) elTahun.textContent = metaData.tahun || '-';
+            if (elTarget) elTarget.textContent = metaData.target_formatted || (metaData.target != null ? metaData.target : '-');
+            if (elRealisasi) elRealisasi.textContent = metaData.realisasi_formatted || (metaData.realisasi != null ? (Math.round(metaData.realisasi) + ' Bukti') : '-');
+            if (elStatus) {
+                const st = metaData.status || '-';
+                let color = '#10b981';
+                if (st === 'Perlu Perhatian') color = '#fbbf24';
+                else if (st === 'Tidak Tercapai') color = '#ef4444';
+                elStatus.innerHTML = `<span style="font-weight: 700; color: ${color};">${st}</span>`;
+            }
+            if (elDeskripsi) elDeskripsi.textContent = metaData.deskripsi_iku || 'Tidak ada deskripsi indikator kinerja.';
+        }
+
+        // Populate Section 2: Rekomendasi AI (murni AI recommendation text)
+        const cleanText = stripFactualHeaderJS(text);
+        const elAiRec = document.getElementById('modal-ai-recommendation');
+        if (elAiRec) elAiRec.innerHTML = parseMarkdown(cleanText);
 
         if (modal) modal.style.display = 'flex';
     };

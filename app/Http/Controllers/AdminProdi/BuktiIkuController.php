@@ -49,6 +49,11 @@ class BuktiIkuController extends Controller
 
         ActivityLog::log('Menambah data', 'Jenis Bukti IKU/IKT', 'Menambahkan Jenis Bukti: ' . $newBukti->nama_bukti);
 
+        if ($request->ajax() || $request->wantsJson()) {
+            session()->flash('success', 'Jenis Bukti IKU/IKT berhasil ditambahkan.');
+            return response()->json(['status' => 'success', 'message' => 'Jenis Bukti IKU/IKT berhasil ditambahkan.']);
+        }
+
         return redirect()->route('adminprodi.bukti.index')->with('success', 'Jenis Bukti IKU/IKT berhasil ditambahkan.');
     }
 
@@ -69,6 +74,11 @@ class BuktiIkuController extends Controller
         $bukti->update($request->all());
 
         ActivityLog::log('Mengubah data', 'Jenis Bukti IKU/IKT', 'Mengubah Jenis Bukti: ' . $bukti->nama_bukti);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            session()->flash('success', 'Jenis Bukti IKU/IKT berhasil diperbarui.');
+            return response()->json(['status' => 'success', 'message' => 'Jenis Bukti IKU/IKT berhasil diperbarui.']);
+        }
 
         return redirect()->route('adminprodi.bukti.index')->with('success', 'Jenis Bukti IKU/IKT berhasil diperbarui.');
     }

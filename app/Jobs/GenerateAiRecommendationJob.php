@@ -173,7 +173,7 @@ class GenerateAiRecommendationJob implements ShouldQueue
             $model = $activeModel->model_id;
 
             try {
-                $response = Http::timeout(30)->post(
+                $response = Http::withoutVerifying()->timeout(30)->post(
                     //alamat endpoint Gemini API.
                     'https://generativelanguage.googleapis.com/v1beta/models/' . $model . ':generateContent?key=' . $apiKey,
                     [
@@ -192,7 +192,7 @@ class GenerateAiRecommendationJob implements ShouldQueue
                 if ($response->successful()) {
                     $result = $response->json();
                     $aiText = $result['candidates'][0]['content']['parts'][0]['text'] ?? 'Gagal memproses rekomendasi AI.';
-                    $recommendationText = $headerText . $aiText;
+                    $recommendationText = $aiText;
                     
                     // Berhasil, perbarui last_used_at dan hapus cooldown
                     $activeModel->update([

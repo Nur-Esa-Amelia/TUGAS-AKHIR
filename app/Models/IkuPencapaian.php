@@ -164,10 +164,10 @@ class IkuPencapaian extends Model
 
                 if (!empty($recipients)) {
                     try {
-                        Mail::to($recipients)->send(new EwsWarningMail($pencapaian));
-                        Log::info("EWS warning email sent successfully to: " . implode(', ', $recipients) . " for IkuPencapaian ID: " . $pencapaian->id);
+                        Mail::to($recipients)->queue(new EwsWarningMail($pencapaian));
+                        Log::info("EWS warning email queued successfully to: " . implode(', ', $recipients) . " for IkuPencapaian ID: " . $pencapaian->id);
                     } catch (\Exception $e) {
-                        Log::error("Failed to send EWS warning email: " . $e->getMessage() . " for IkuPencapaian ID: " . $pencapaian->id);
+                        Log::error("Failed to queue EWS warning email: " . $e->getMessage() . " for IkuPencapaian ID: " . $pencapaian->id);
                     }
                 }
             }

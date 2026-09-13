@@ -127,6 +127,11 @@ class PenugasanController extends Controller
 
         PenugasanDosen::create($request->all());
 
+        if ($request->ajax() || $request->wantsJson()) {
+            session()->flash('success', 'Penugasan dosen berhasil dibuat.');
+            return response()->json(['status' => 'success', 'message' => 'Penugasan dosen berhasil dibuat.']);
+        }
+
         return redirect()->route('adminprodi.penugasan.index', ['tahun' => $request->tahun])->with('success', 'Penugasan dosen berhasil dibuat.');
     }
 
@@ -200,6 +205,11 @@ class PenugasanController extends Controller
         }
 
         $penugasan->update($request->all());
+
+        if ($request->ajax() || $request->wantsJson()) {
+            session()->flash('success', 'Penugasan dosen berhasil diperbarui.');
+            return response()->json(['status' => 'success', 'message' => 'Penugasan dosen berhasil diperbarui.']);
+        }
 
         return redirect()->route('adminprodi.penugasan.index', ['tahun' => $penugasan->tahun])->with('success', 'Penugasan dosen berhasil diperbarui.');
     }

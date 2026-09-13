@@ -53,6 +53,11 @@ class IkuController extends Controller
 
         ActivityLog::log('Menambah data', 'Data IKU/IKT', 'Menambahkan IKU/IKT: ' . $newIku->nama_iku);
 
+        if ($request->ajax() || $request->wantsJson()) {
+            session()->flash('success', 'Data IKU/IKT berhasil ditambahkan.');
+            return response()->json(['status' => 'success', 'message' => 'Data IKU/IKT berhasil ditambahkan.']);
+        }
+
         return redirect()->route('adminprodi.iku.index')->with('success', 'Data IKU/IKT berhasil ditambahkan.');
     }
 
@@ -74,6 +79,11 @@ class IkuController extends Controller
         $iku->update($request->all());
 
         ActivityLog::log('Mengubah data', 'Data IKU/IKT', 'Mengubah IKU/IKT: ' . $iku->nama_iku);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            session()->flash('success', 'Data IKU/IKT berhasil diperbarui.');
+            return response()->json(['status' => 'success', 'message' => 'Data IKU/IKT berhasil diperbarui.']);
+        }
 
         return redirect()->route('adminprodi.iku.index')->with('success', 'Data IKU/IKT berhasil diperbarui.');
     }
