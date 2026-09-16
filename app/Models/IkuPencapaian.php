@@ -88,14 +88,13 @@ class IkuPencapaian extends Model
             return null;
         }
 
-        $terpakai = FileIsiBukti::whereHas('pengisianBukti', function ($query) use ($ikuId, $tahun, $prodiId) {
-            $query->where('id_iku', $ikuId)
-                ->where('tahun', $tahun)
-                ->whereIn('status', ['pending', 'valid'])
-                ->whereHas('user', function ($userQuery) use ($prodiId) {
-                    $userQuery->where('prodi_id', $prodiId);
-                });
-        })->count();
+        $terpakai = FileIsiBukti::join('pengisian_bukti', 'file_isi_bukti.id_pengisian_bukti', '=', 'pengisian_bukti.id')
+            ->join('users', 'pengisian_bukti.id_user', '=', 'users.id')
+            ->where('pengisian_bukti.id_iku', $ikuId)
+            ->where('pengisian_bukti.tahun', $tahun)
+            ->whereIn('pengisian_bukti.status', ['pending', 'valid'])
+            ->where('users.prodi_id', $prodiId)
+            ->count();
 
         return max(0, $pencapaian->batasBerkas() - $terpakai);
     }
@@ -106,21 +105,24 @@ class IkuPencapaian extends Model
     public static function calculateAndSync($prodiId, $tahun)
     {
         $settings = Pengaturan::where('id_prodi', $prodiId)->first();
-        $jml_mahasiswa = $settings ? $settings->jml_mahasiswa : 0;
-        $jml_dosen = $settings ? $settings->jml_dosen : 0;
+        $pencapaians = self::where('id_prodi', $prodiId)->where('tahun', $tahun)->get();
 
-        $pencapaians = self::where('id_prodi', $prodiId)->where('tahun', $tahun)->get(); 
+        if ($pencapaians->isEmpty()) {
+            return;
+        }
+
+        // Ambil seluruh jumlah realisasi per id_iku sekaligus dalam 1 query gabungan yang sangat cepat
+        $realisasiMap = FileIsiBukti::join('pengisian_bukti', 'file_isi_bukti.id_pengisian_bukti', '=', 'pengisian_bukti.id')
+            ->join('users', 'pengisian_bukti.id_user', '=', 'users.id')
+            ->where('pengisian_bukti.tahun', $tahun)
+            ->where('pengisian_bukti.status', 'valid')
+            ->where('users.prodi_id', $prodiId)
+            ->selectRaw('pengisian_bukti.id_iku, COUNT(file_isi_bukti.id) as total')
+            ->groupBy('pengisian_bukti.id_iku')
+            ->pluck('total', 'id_iku');
 
         foreach ($pencapaians as $pencapaian) {
-            // Realisasi adalah jumlah berkas bukti yang diunggah oleh dosen dari prodi ini, di tahun ini, dan berstatus 'valid'
-            $realisasi = FileIsiBukti::whereHas('pengisianBukti', function ($query) use ($pencapaian, $tahun, $prodiId) {
-                $query->where('id_iku', $pencapaian->id_iku)
-                    ->where('tahun', $tahun)
-                    ->where('status', 'valid')
-                    ->whereHas('user', function ($q) use ($prodiId) {
-                        $q->where('prodi_id', $prodiId);
-                    });
-            })->count();
+            $realisasi = (int) ($realisasiMap[$pencapaian->id_iku] ?? 0);
 
             $target_nyata = $pencapaian->targetNyata($settings);
 
