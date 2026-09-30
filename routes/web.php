@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminSistem\DashboardController as AdminSistemDashboard
 use App\Http\Controllers\AdminSistem\UserController as AdminSistemUserController;
 use App\Http\Controllers\AdminSistem\ProdiController as AdminSistemProdiController;
 use App\Http\Controllers\AdminSistem\ModelTokenAiController as AdminSistemModelTokenAiController;
+use App\Http\Controllers\AdminSistem\PromptAiController as AdminSistemPromptAiController;
 use App\Http\Controllers\AdminP2mp\DashboardController as AdminP2mpDashboardController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -105,6 +106,13 @@ Route::middleware('auth')->group(function () {
         Route::post('/model-ai/{id}/activate', [AdminSistemModelTokenAiController::class, 'activate'])->name('model_ai.activate');
         Route::get('/aktivitas', [\App\Http\Controllers\AdminSistem\ActivityLogController::class, 'index'])->name('aktivitas.index');
         Route::get('/hasil-evaluasi', [\App\Http\Controllers\AdminSistem\HasilEvaluasiController::class, 'index'])->name('hasil-evaluasi.index');
+
+        // Manajemen Prompt AI Dinamis
+        Route::get('/prompt-ai', [AdminSistemPromptAiController::class, 'index'])->name('prompt_ai.index');
+        Route::post('/prompt-ai', [AdminSistemPromptAiController::class, 'store'])->name('prompt_ai.store');
+        Route::put('/prompt-ai/{id}', [AdminSistemPromptAiController::class, 'update'])->name('prompt_ai.update');
+        Route::post('/prompt-ai/{id}/activate', [AdminSistemPromptAiController::class, 'activate'])->name('prompt_ai.activate');
+        Route::delete('/prompt-ai/{id}', [AdminSistemPromptAiController::class, 'destroy'])->name('prompt_ai.destroy');
     });
 
     // Rute yang dapat diakses oleh Admin Prodi, Kaprodi & Admin P2MP

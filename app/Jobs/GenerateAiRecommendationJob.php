@@ -6,6 +6,7 @@ use App\Models\IkuPencapaian;
 use App\Models\RekomendasiAi;
 use App\Models\BuktiIku;
 use App\Models\PengisianBukti;
+use App\Models\AiPrompt;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -87,59 +88,127 @@ class GenerateAiRecommendationJob implements ShouldQueue
             }
         }
 
-        $prompt = "Anda adalah Asisten AI Sistem Early Warning IKU/IKT (Indikator Kinerja Utama) Perguruan Tinggi.\n";
-        $prompt .= "Berikan analisis risiko dan rekomendasi perbaikan untuk indikator yang tidak tercapai berikut:\n\n";
-        $prompt .= "### 1. Data IKU/IKT & Deskripsi\n";
-        $prompt .= "- Nama IKU/IKT: " . $namaIku . "\n";
-        $prompt .= "- Deskripsi: " . $deskripsi . "\n";
-        $prompt .= "- Program Studi: " . $prodiName . "\n";
-        $prompt .= "- Tahun Akademik: " . $tahun . "\n";
-        $prompt .= "- Target: " . $target . "\n";
-        $prompt .= "- Realisasi: " . $realisasi . "\n";
-        $prompt .= "- Status: " . $status . " (Perlu Perhatian / Tidak Tercapai)\n\n";
+        // =====================================================================
+        // PROMPT DINAMIS: Siapkan nilai-nilai yang akan diinjeksikan ke template
+        // =====================================================================
 
-        $prompt .= "### 2. Jenis Bukti yang Wajib Dilaporkan\n";
+        // Bangun string daftar bukti wajib
+        $daftarBuktiWajib = '';
         if ($buktiIkuList->isEmpty()) {
-            $prompt .= "(Belum didefinisikan untuk IKU/IKT ini)\n\n";
+            $daftarBuktiWajib = '(Belum didefinisikan untuk IKU/IKT ini)';
         } else {
             foreach ($buktiIkuList as $bukti) {
-                $prompt .= "- **" . $bukti->nama_bukti . "**" . ($bukti->deskripsi ? ": " . $bukti->deskripsi : "") . "\n";
+                $daftarBuktiWajib .= "- **" . $bukti->nama_bukti . "**" . ($bukti->deskripsi ? ": " . $bukti->deskripsi : "") . "\n";
             }
-            $prompt .= "\n";
         }
 
-        $prompt .= "### 3. Perbandingan Bukti yang Sudah dan Belum Diunggah\n";
+        // Bangun string bukti sudah diunggah
+        $buktiSudahStr = '';
         if ($buktiIkuList->isEmpty()) {
-            $prompt .= "(Tidak dapat dibandingkan karena jenis bukti belum didefinisikan)\n\n";
+            $buktiSudahStr = '(Tidak dapat dibandingkan karena jenis bukti belum didefinisikan)';
+        } elseif (empty($sudahDiunggah)) {
+            $buktiSudahStr = '- (Belum ada bukti yang diunggah)';
         } else {
-            $prompt .= "**Bukti yang Sudah Diunggah:**\n";
-            if (empty($sudahDiunggah)) {
-                $prompt .= "- (Belum ada bukti yang diunggah)\n";
-            } else {
-                foreach ($sudahDiunggah as $s) {
-                    $prompt .= $s . "\n"; //masukkan data ygdi unggah ke prompt
-                }
-            }
-            $prompt .= "\n**Bukti yang Belum Diunggah:**\n";
-            if (empty($belumDiunggah)) {
-                $prompt .= "- (Semua jenis bukti wajib sudah memiliki unggahan)\n";
-            } else {
-                foreach ($belumDiunggah as $b) {
-                    $prompt .= $b . "\n"; //Memasukkan nama dan informasi bukti yang belum diunggah ke prompt.
-                }
-            }
-            $prompt .= "\n";
+            $buktiSudahStr = implode("\n", $sudahDiunggah); //masukkan data yg di unggah ke prompt
         }
 
-        $prompt .= "Tugas Anda:\n";
-        $prompt .= "Berikan analisis terperinci yang mencakup tiga bagian berikut dengan sub-heading yang jelas:\n";
-        $prompt .= "1. Prioritas Penanganan: Berikan prioritas penanganan (Tinggi / Sedang / Rendah) beserta alasan taktisnya.\n";
-        $prompt .= "2. Analisis Risiko: Uraikan dampak buruk jika indikator ini terus-menerus tidak tercapai.\n";
-        $prompt .= "3. Rekomendasi Perbaikan: Uraikan langkah-langkah konkret, strategis, dan realistis untuk meningkatkan capaian IKU/IKT tersebut.\n\n";
-        $prompt .= "PENTING:\n";
-        $prompt .= "- Analisislah perbandingan bukti yang sudah dan belum diunggah di atas secara mendalam. Rekomendasi perbaikan harus didasarkan pada kondisi nyata tersebut (misal: menyuruh mengunggah bukti yang belum ada, menindaklanjuti bukti yang ditolak/pending, dll.), sehingga rekomendasi yang dihasilkan sangat spesifik sesuai dengan kondisi nyata pada indikator tersebut dan tidak bersifat general/umum.\n";
-        $prompt .= "- Jangan ulangi lagi bagian informasi data IKU/IKT, jenis bukti wajib, atau perbandingan bukti di jawaban Anda. Mulailah respon Anda langsung dengan heading/sub-heading untuk 3 poin analisis di atas.\n\n";
-        $prompt .= "Sajikan jawaban Anda dalam Bahasa Indonesia yang formal, ringkas, terstruktur menggunakan format markdown (gunakan bullet points, sub-heading, dan cetak tebal).";
+        // Bangun string bukti belum diunggah
+        $buktiBelumStr = '';
+        if ($buktiIkuList->isEmpty()) {
+            $buktiBelumStr = '(Tidak dapat dibandingkan karena jenis bukti belum didefinisikan)';
+        } elseif (empty($belumDiunggah)) {
+            $buktiBelumStr = '- (Semua jenis bukti wajib sudah memiliki unggahan)';
+        } else {
+            $buktiBelumStr = implode("\n", $belumDiunggah); //Memasukkan nama dan informasi bukti yang belum diunggah ke prompt.
+        }
+
+        // Peta placeholder => nilai nyata
+        $placeholders = [
+            '{nama_iku}'              => $namaIku,
+            '{deskripsi}'             => $deskripsi,
+            '{prodi}'                 => $prodiName,
+            '{tahun}'                 => $tahun,
+            '{target}'                => $target,
+            '{realisasi}'             => $realisasi,
+            '{status}'                => $status,
+            '{daftar_bukti_wajib}'    => trim($daftarBuktiWajib),
+            '{bukti_sudah_diunggah}'  => trim($buktiSudahStr),
+            '{bukti_belum_diunggah}'  => trim($buktiBelumStr),
+        ];
+
+        // Cek apakah ada prompt aktif di database
+        $activePrompt = AiPrompt::getActive();
+
+        if ($activePrompt) {
+            // Gunakan template dari database, ganti semua placeholder dengan data nyata
+            $prompt = str_replace(
+                array_keys($placeholders),
+                array_values($placeholders),
+                $activePrompt->prompt_template
+            );
+
+            Log::info('Menggunakan prompt dinamis dari database', [
+                'prompt_id'   => $activePrompt->id,
+                'prompt_name' => $activePrompt->name,
+            ]);
+        } else {
+            // Fallback: gunakan prompt statis bawaan sistem (tidak ada perubahan perilaku)
+            Log::info('Tidak ada prompt aktif di database, menggunakan prompt statis bawaan.');
+
+            $prompt = "Anda adalah Asisten AI Sistem Early Warning IKU/IKT (Indikator Kinerja Utama) Perguruan Tinggi.\n";
+            $prompt .= "Berikan analisis risiko dan rekomendasi perbaikan untuk indikator yang tidak tercapai berikut:\n\n";
+            $prompt .= "### 1. Data IKU/IKT & Deskripsi\n";
+            $prompt .= "- Nama IKU/IKT: " . $namaIku . "\n";
+            $prompt .= "- Deskripsi: " . $deskripsi . "\n";
+            $prompt .= "- Program Studi: " . $prodiName . "\n";
+            $prompt .= "- Tahun Akademik: " . $tahun . "\n";
+            $prompt .= "- Target: " . $target . "\n";
+            $prompt .= "- Realisasi: " . $realisasi . "\n";
+            $prompt .= "- Status: " . $status . " (Perlu Perhatian / Tidak Tercapai)\n\n";
+
+            $prompt .= "### 2. Jenis Bukti yang Wajib Dilaporkan\n";
+            if ($buktiIkuList->isEmpty()) {
+                $prompt .= "(Belum didefinisikan untuk IKU/IKT ini)\n\n";
+            } else {
+                foreach ($buktiIkuList as $bukti) {
+                    $prompt .= "- **" . $bukti->nama_bukti . "**" . ($bukti->deskripsi ? ": " . $bukti->deskripsi : "") . "\n";
+                }
+                $prompt .= "\n";
+            }
+
+            $prompt .= "### 3. Perbandingan Bukti yang Sudah dan Belum Diunggah\n";
+            if ($buktiIkuList->isEmpty()) {
+                $prompt .= "(Tidak dapat dibandingkan karena jenis bukti belum didefinisikan)\n\n";
+            } else {
+                $prompt .= "**Bukti yang Sudah Diunggah:**\n";
+                if (empty($sudahDiunggah)) {
+                    $prompt .= "- (Belum ada bukti yang diunggah)\n";
+                } else {
+                    foreach ($sudahDiunggah as $s) {
+                        $prompt .= $s . "\n"; //masukkan data ygdi unggah ke prompt
+                    }
+                }
+                $prompt .= "\n**Bukti yang Belum Diunggah:**\n";
+                if (empty($belumDiunggah)) {
+                    $prompt .= "- (Semua jenis bukti wajib sudah memiliki unggahan)\n";
+                } else {
+                    foreach ($belumDiunggah as $b) {
+                        $prompt .= $b . "\n"; //Memasukkan nama dan informasi bukti yang belum diunggah ke prompt.
+                    }
+                }
+                $prompt .= "\n";
+            }
+
+            $prompt .= "Tugas Anda:\n";
+            $prompt .= "Berikan analisis terperinci yang mencakup tiga bagian berikut dengan sub-heading yang jelas:\n";
+            $prompt .= "1. Prioritas Penanganan: Berikan prioritas penanganan (Tinggi / Sedang / Rendah) beserta alasan taktisnya.\n";
+            $prompt .= "2. Analisis Risiko: Uraikan dampak buruk jika indikator ini terus-menerus tidak tercapai.\n";
+            $prompt .= "3. Rekomendasi Perbaikan: Uraikan langkah-langkah konkret, strategis, dan realistis untuk meningkatkan capaian IKU/IKT tersebut.\n\n";
+            $prompt .= "PENTING:\n";
+            $prompt .= "- Analisislah perbandingan bukti yang sudah dan belum diunggah di atas secara mendalam. Rekomendasi perbaikan harus didasarkan pada kondisi nyata tersebut (misal: menyuruh mengunggah bukti yang belum ada, menindaklanjuti bukti yang ditolak/pending, dll.), sehingga rekomendasi yang dihasilkan sangat spesifik sesuai dengan kondisi nyata pada indikator tersebut dan tidak bersifat general/umum.\n";
+            $prompt .= "- Jangan ulangi lagi bagian informasi data IKU/IKT, jenis bukti wajib, atau perbandingan bukti di jawaban Anda. Mulailah respon Anda langsung dengan heading/sub-heading untuk 3 poin analisis di atas.\n\n";
+            $prompt .= "Sajikan jawaban Anda dalam Bahasa Indonesia yang formal, ringkas, terstruktur menggunakan format markdown (gunakan bullet points, sub-heading, dan cetak tebal).";
+        }
 
         // Mempersiapkan teks detail informasi untuk disimpan ke database dan ditampilkan di modal
         $headerText = "### Analisis Risiko dan Rekomendasi Perbaikan IKU/IKT {$namaIku}\n\n";

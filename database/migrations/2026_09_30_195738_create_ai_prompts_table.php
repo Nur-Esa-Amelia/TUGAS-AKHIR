@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('ai_prompts', function (Blueprint $table) {
             $table->id();
+            $table->string('name'); // Nama/label prompt (misal: "Prompt Standar", "Prompt Ringkas")
+            $table->longText('prompt_template'); // Template prompt dengan placeholder {variabel}
+            $table->enum('status', ['aktif', 'nonaktif'])->default('nonaktif');
+            $table->text('keterangan')->nullable(); // Catatan/keterangan admin
             $table->timestamps();
         });
     }
