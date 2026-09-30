@@ -66,10 +66,22 @@
         height: 100vh !important;
         max-height: 100vh !important;
         margin: 0 !important;
+        background-color: #080c14 !important;
     }
 
     body {
-        background-image: linear-gradient(rgba(11, 15, 25, 0.75), rgba(11, 15, 25, 0.75)), url('{{ asset("images/gambar2.jpeg") }}') !important;
+        background-color: #080c14 !important;
+        background-image: linear-gradient(rgba(8, 12, 20, 0.82), rgba(8, 12, 20, 0.82)), url('{{ asset("images/gambar2.jpeg") }}') !important;
+        background-size: cover !important;
+        background-position: center !important;
+        background-repeat: no-repeat !important;
+        background-attachment: fixed !important;
+    }
+
+    /* Override agar light theme tidak menimpa background gelap di halaman login */
+    html[data-theme="light"] body {
+        background-color: #080c14 !important;
+        background-image: linear-gradient(rgba(8, 12, 20, 0.82), rgba(8, 12, 20, 0.82)), url('{{ asset("images/gambar2.jpeg") }}') !important;
         background-size: cover !important;
         background-position: center !important;
         background-repeat: no-repeat !important;

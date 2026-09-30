@@ -201,7 +201,7 @@
         document.getElementById('edit_nama_prodi').value = nama;
         
         const form = document.getElementById('editForm');
-        form.action = `/adminp2mp/prodi/${id}`;
+        form.action = `/adminsistem/prodi/${id}`;
         
         document.getElementById('editModal').classList.add('show');
     }

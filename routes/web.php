@@ -87,6 +87,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/validasi-bulk-approve', [\App\Http\Controllers\AdminP2mp\BulkApproveController::class, 'bulkApprove'])->name('validasi.bulk-approve');
         Route::get('/monitoring', [AdminP2mpDashboardController::class, 'monitoring'])->name('monitoring');
         Route::get('/monitoring/export-excel', [AdminP2mpDashboardController::class, 'exportExcel'])->name('monitoring.export-excel');
+        Route::get('/pengaturan-status', [\App\Http\Controllers\AdminP2mp\PengaturanStatusController::class, 'index'])->name('pengaturan-status.index');
+        Route::post('/pengaturan-status', [\App\Http\Controllers\AdminP2mp\PengaturanStatusController::class, 'store'])->name('pengaturan-status.store');
     });
 
     // Rute Admin Sistem

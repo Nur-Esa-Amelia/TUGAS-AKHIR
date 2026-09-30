@@ -165,7 +165,7 @@
                         <label for="satuan" class="form-label-custom">Satuan Target <span style="color: #ef4444;">*</span></label>
                         <select id="satuan" name="satuan" class="form-select-custom" required>
                             <option value="persen">Persen (%)</option>
-                            <option value="angka">Angka (Absolut)</option>
+                            <option value="angka">Angka</option>
                         </select>
                     </div>
                 </div>

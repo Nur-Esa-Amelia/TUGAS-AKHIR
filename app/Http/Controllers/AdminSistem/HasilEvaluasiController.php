@@ -68,6 +68,7 @@ class HasilEvaluasiController extends Controller
                     'jabatan' => $penilaian->jabatan,
                     'prodi_unit' => $penilaian->prodi_unit,
                     'ikus' => [], // iku_id => rata-rata fakta IKU ini untuk expert ini
+                    'details_list' => [], // rincian penilaian IKU & klaim per expert untuk fungsi cetak
                 ];
             }
 
@@ -93,6 +94,24 @@ class HasilEvaluasiController extends Controller
                 $expertData[$expertKey]['ikus'][$ikuId] = [
                     'fakta' => $avgFaktaIkuForExpert,
                     'halusinasi' => $avgHaluIkuForExpert,
+                ];
+
+                // Simpan rincian lengkap untuk kebutuhan cetak per expert
+                $expertData[$expertKey]['details_list'][] = [
+                    'kode_iku' => $ikuKode,
+                    'nama_iku' => $ikuNama,
+                    'prodi' => $prodiNama,
+                    'tahun' => $tahun,
+                    'fakta' => $avgFaktaIkuForExpert,
+                    'halusinasi' => $avgHaluIkuForExpert,
+                    'claims' => $details->map(function ($d) {
+                        return [
+                            'klaim' => $d->klaim,
+                            'persentase_fakta' => $d->persentase_fakta,
+                            'persentase_halusinasi' => $d->persentase_halusinasi,
+                            'catatan' => $d->catatan,
+                        ];
+                    })->toArray(),
                 ];
 
                 // Tambahkan ke data IKU global
@@ -156,12 +175,14 @@ class HasilEvaluasiController extends Controller
             $expertHalu = round(100 - $expertFakta, 2);
 
             $processedExperts[] = [
+                'expert_key' => $key,
                 'nama_penilai' => $exp['nama_penilai'],
                 'jabatan' => $exp['jabatan'],
                 'prodi_unit' => $exp['prodi_unit'],
                 'jumlah_iku' => $countIkus,
                 'fakta' => $expertFakta,
                 'halusinasi' => $expertHalu,
+                'details_list' => $exp['details_list'] ?? [],
             ];
 
             $sumExpertFakta += $expertFakta;

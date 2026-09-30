@@ -68,9 +68,9 @@ class DashboardController extends Controller
             $targetVal = floatval($item->target);
             if ($item->satuan === 'persen') {
                 if ($item->objek === 'mahasiswa') {
-                    $targetNyata = ($targetVal / 100) * $jml_mahasiswa;
+                    $targetNyata = round(($targetVal / 100) * $jml_mahasiswa);
                 } elseif ($item->objek === 'dosen') {
-                    $targetNyata = ($targetVal / 100) * $jml_dosen;
+                    $targetNyata = round(($targetVal / 100) * $jml_dosen);
                 } else {
                     $targetNyata = $targetVal;
                 }
@@ -79,7 +79,7 @@ class DashboardController extends Controller
             }
 
             if ($targetNyata > 0) {
-                $persentase = min(($item->realisasi / $targetNyata) * 100, 100);
+                $persentase = min(round(($item->realisasi / $targetNyata) * 100, 2), 100);
             } else {
                 $persentase = $item->realisasi > 0 ? 100 : 0;
             }
@@ -93,8 +93,8 @@ class DashboardController extends Controller
             }
         }
 
-        $avgMahasiswa = $mahasiswaIkus->count() > 0 ? round($mahasiswaIkus->avg('persentase_capped')) : 0;
-        $avgDosen = $dosenIkus->count() > 0 ? round($dosenIkus->avg('persentase_capped')) : 0;
+        $avgMahasiswa = $mahasiswaIkus->count() > 0 ? round($mahasiswaIkus->avg('persentase_capped'), 2) : 0;
+        $avgDosen = $dosenIkus->count() > 0 ? round($dosenIkus->avg('persentase_capped'), 2) : 0;
 
         // Filter indikator yang bermasalah (Perlu Perhatian atau Tidak Tercapai)
         $warnings = $pencapaians->filter(function ($item) {
@@ -103,6 +103,10 @@ class DashboardController extends Controller
 
         $rekomendasiController = new \App\Http\Controllers\RekomendasiAiController();
         $recommendations = $rekomendasiController->getOrGenerate($warnings);
+
+        //thrsold
+        $thresholdTercapai = (float) ($settings?->threshold_tercapai ?? 100.00);
+        $thresholdPerluPerhatian = (float) ($settings?->threshold_perlu_perhatian ?? 60.00);
 
         return view('adminprodi.dashboard', compact(
             'prodiName',
@@ -116,7 +120,9 @@ class DashboardController extends Controller
             'settings',
             'recommendations',
             'avgMahasiswa',
-            'avgDosen'
+            'avgDosen',
+            'thresholdTercapai',
+            'thresholdPerluPerhatian'
         ));
     }
 

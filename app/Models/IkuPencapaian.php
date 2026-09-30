@@ -102,9 +102,18 @@ class IkuPencapaian extends Model
     /**
      * Hitung realisasi dan sinkronisasikan status berdasarkan bukti yang divalidasi P2MP.
      */
-    public static function calculateAndSync($prodiId, $tahun)
+    public static function calculateAndSync($prodiId, $tahun = null)
     {
         $settings = Pengaturan::where('id_prodi', $prodiId)->first();
+
+        if ($tahun === null) {
+            $tahunList = self::where('id_prodi', $prodiId)->distinct()->pluck('tahun');
+            foreach ($tahunList as $t) {
+                self::calculateAndSync($prodiId, $t);
+            }
+            return;
+        }
+
         $pencapaians = self::where('id_prodi', $prodiId)->where('tahun', $tahun)->get();
 
         if ($pencapaians->isEmpty()) {
@@ -121,23 +130,27 @@ class IkuPencapaian extends Model
             ->groupBy('pengisian_bukti.id_iku')
             ->pluck('total', 'id_iku');
 
+        // Threshold values from settings or fallback default variables
+        $thresholdTercapai = (float) ($settings?->threshold_tercapai ?? 100.00);
+        $thresholdPerluPerhatian = (float) ($settings?->threshold_perlu_perhatian ?? 60.00);
+
         foreach ($pencapaians as $pencapaian) {
             $realisasi = (int) ($realisasiMap[$pencapaian->id_iku] ?? 0);
 
             $target_nyata = $pencapaian->targetNyata($settings);
 
-            // Tentukan status ketercapaian target
+            // Tentukan status ketercapaian target (2 angka desimal, maksimal 100)
             if ($target_nyata > 0) {
-                $persentase = min(($realisasi / $target_nyata) * 100, 100);
+                $persentase = min(round(($realisasi / $target_nyata) * 100, 2), 100);
             } else {
                 $persentase = $realisasi > 0 ? 100 : 0;
             }
 
-            if ($persentase >= 100) {
+            if ($persentase >= $thresholdTercapai) {
                 $status = 'Tercapai';
                 // Hapus rekomendasi jika ada karena status sudah tercapai/aman
                 \App\Models\RekomendasiAi::where('id_iku_pencapaian', $pencapaian->id)->delete();
-            } elseif ($persentase >= 60) {
+            } elseif ($persentase >= $thresholdPerluPerhatian) {
                 $status = 'Perlu Perhatian';
             } else {
                 $status = 'Tidak Tercapai';

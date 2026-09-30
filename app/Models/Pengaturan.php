@@ -19,6 +19,8 @@ class Pengaturan extends Model
         'tahun_aktif',
         'jml_mahasiswa',
         'jml_dosen',
+        'threshold_tercapai',
+        'threshold_perlu_perhatian',
     ];
 
     public function prodi()

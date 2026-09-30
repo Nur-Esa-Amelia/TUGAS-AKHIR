@@ -132,28 +132,28 @@
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 24px;">
     <!-- Perspektif Mahasiswa -->
     <div class="card" style="display: flex; align-items: center; gap: 20px; padding: 20px; position: relative; overflow: hidden; border-color: rgba(56, 189, 248, 0.15);">
-        <div style="position: relative; width: 76px; height: 76px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: conic-gradient({{ $avgMahasiswa >= 100 ? '#10b981' : ($avgMahasiswa >= 60 ? '#f59e0b' : '#ef4444') }} {{ $avgMahasiswa * 3.6 }}deg, var(--bg-surface2) 0deg); flex-shrink: 0; box-shadow: inset 0 0 8px rgba(0,0,0,0.5);">
+        <div style="position: relative; width: 76px; height: 76px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: conic-gradient({{ $avgMahasiswa >= $thresholdTercapai ? '#10b981' : ($avgMahasiswa >= $thresholdPerluPerhatian ? '#f59e0b' : '#ef4444') }} {{ $avgMahasiswa * 3.6 }}deg, var(--bg-surface2) 0deg); flex-shrink: 0; box-shadow: inset 0 0 8px rgba(0,0,0,0.5);">
             <div style="content: ''; position: absolute; width: 60px; height: 60px; border-radius: 50%; background-color: var(--bg-surface);"></div>
             <span style="position: relative; font-size: 1.1rem; font-weight: 800; color: var(--text-primary);">{{ $avgMahasiswa }}%</span>
         </div>
         <div style="display: flex; flex-direction: column; gap: 4px;">
             <h4 style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin: 0;">Perspektif Mahasiswa</h4>
-            <span class="badge-custom {{ $avgMahasiswa >= 100 ? 'badge-green' : ($avgMahasiswa >= 60 ? 'badge-blue' : 'badge-rose') }}" style="align-self: flex-start; font-size: 0.6rem; margin-top: 2px;">
-                {{ $avgMahasiswa >= 100 ? 'Sangat Baik' : ($avgMahasiswa >= 60 ? 'Cukup Baik' : 'Kurang/Risiko') }}
+            <span class="badge-custom {{ $avgMahasiswa >= $thresholdTercapai ? 'badge-green' : ($avgMahasiswa >= $thresholdPerluPerhatian ? 'badge-blue' : 'badge-rose') }}" style="align-self: flex-start; font-size: 0.6rem; margin-top: 2px;">
+                {{ $avgMahasiswa >= $thresholdTercapai ? 'Sangat Baik' : ($avgMahasiswa >= $thresholdPerluPerhatian ? 'Cukup Baik' : 'Kurang/Risiko') }}
             </span>
         </div>
     </div>
 
     <!-- Perspektif Dosen -->
     <div class="card" style="display: flex; align-items: center; gap: 20px; padding: 20px; position: relative; overflow: hidden; border-color: rgba(168, 85, 247, 0.15);">
-        <div style="position: relative; width: 76px; height: 76px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: conic-gradient({{ $avgDosen >= 100 ? '#10b981' : ($avgDosen >= 60 ? '#f59e0b' : '#ef4444') }} {{ $avgDosen * 3.6 }}deg, var(--bg-surface2) 0deg); flex-shrink: 0; box-shadow: inset 0 0 8px rgba(0,0,0,0.5);">
+        <div style="position: relative; width: 76px; height: 76px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: conic-gradient({{ $avgDosen >= $thresholdTercapai ? '#10b981' : ($avgDosen >= $thresholdPerluPerhatian ? '#f59e0b' : '#ef4444') }} {{ $avgDosen * 3.6 }}deg, var(--bg-surface2) 0deg); flex-shrink: 0; box-shadow: inset 0 0 8px rgba(0,0,0,0.5);">
             <div style="content: ''; position: absolute; width: 60px; height: 60px; border-radius: 50%; background-color: var(--bg-surface);"></div>
             <span style="position: relative; font-size: 1.1rem; font-weight: 800; color: var(--text-primary);">{{ $avgDosen }}%</span>
         </div>
         <div style="display: flex; flex-direction: column; gap: 4px;">
             <h4 style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin: 0;">Perspektif Dosen</h4>
-            <span class="badge-custom {{ $avgDosen >= 100 ? 'badge-green' : ($avgDosen >= 60 ? 'badge-purple' : 'badge-rose') }}" style="align-self: flex-start; font-size: 0.6rem; margin-top: 2px;">
-                {{ $avgDosen >= 100 ? 'Sangat Baik' : ($avgDosen >= 60 ? 'Cukup Baik' : 'Kurang/Risiko') }}
+            <span class="badge-custom {{ $avgDosen >= $thresholdTercapai ? 'badge-green' : ($avgDosen >= $thresholdPerluPerhatian ? 'badge-purple' : 'badge-rose') }}" style="align-self: flex-start; font-size: 0.6rem; margin-top: 2px;">
+                {{ $avgDosen >= $thresholdTercapai ? 'Sangat Baik' : ($avgDosen >= $thresholdPerluPerhatian ? 'Cukup Baik' : 'Kurang/Risiko') }}
             </span>
         </div>
     </div>
@@ -215,9 +215,9 @@
                         
                         if ($item->satuan === 'persen') {
                             if ($item->objek === 'mahasiswa') {
-                                $targetNyata = ($targetVal / 100) * $jml_mahasiswa;
+                                $targetNyata = round(($targetVal / 100) * $jml_mahasiswa);
                             } elseif ($item->objek === 'dosen') {
-                                $targetNyata = ($targetVal / 100) * $jml_dosen;
+                                $targetNyata = round(($targetVal / 100) * $jml_dosen);
                             } else {
                                 $targetNyata = $targetVal;
                             }
@@ -226,7 +226,7 @@
                         }
 
                         if ($targetNyata > 0) {
-                            $persentase = min(round(($item->realisasi / $targetNyata) * 100), 100);
+                            $persentase = min(round(($item->realisasi / $targetNyata) * 100, 2), 100);
                         } else {
                             $persentase = $item->realisasi > 0 ? 100 : 0;
                         }

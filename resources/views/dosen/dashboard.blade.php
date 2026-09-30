@@ -196,7 +196,7 @@
                             {{ $item->realisasi }} Bukti
                         </td>
                         <td style="text-align: center; font-weight: 700; color: #10b981;">
-                            {{ round($item->persentase) }}%
+                            {{ number_format($item->persentase, 2) }}%
                         </td>
                         <td style="text-align: center;">
                             @if(!empty($item->target_tercapai) && $item->target_tercapai)

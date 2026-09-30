@@ -88,9 +88,9 @@ class DashboardController extends Controller
             $targetVal = floatval($item->target);
             if ($item->satuan === 'persen') {
                 if ($item->objek === 'mahasiswa') {
-                    $targetNyata = ($targetVal / 100) * $jml_mahasiswa;
+                    $targetNyata = round(($targetVal / 100) * $jml_mahasiswa);
                 } elseif ($item->objek === 'dosen') {
-                    $targetNyata = ($targetVal / 100) * $jml_dosen;
+                    $targetNyata = round(($targetVal / 100) * $jml_dosen);
                 } else {
                     $targetNyata = $targetVal;
                 }
@@ -100,7 +100,7 @@ class DashboardController extends Controller
 
             // menghitung persentase
             if ($targetNyata > 0) {
-                $persentase = min(($item->realisasi / $targetNyata) * 100, 100);
+                $persentase = min(round(($item->realisasi / $targetNyata) * 100, 2), 100);
             } else {
                 $persentase = $item->realisasi > 0 ? 100 : 0;
             }
@@ -115,12 +115,16 @@ class DashboardController extends Controller
         }
 
         // rata rata bsc
-        $avgMahasiswa = $mahasiswaIkus->count() > 0 ? round($mahasiswaIkus->avg('persentase_capped')) : 0;
-        $avgDosen = $dosenIkus->count() > 0 ? round($dosenIkus->avg('persentase_capped')) : 0;
+        $avgMahasiswa = $mahasiswaIkus->count() > 0 ? round($mahasiswaIkus->avg('persentase_capped'), 2) : 0;
+        $avgDosen = $dosenIkus->count() > 0 ? round($dosenIkus->avg('persentase_capped'), 2) : 0;
 
         // Hitung IKU/IKT Tercapai & Belum Tercapai untuk kartu metrik
         $achievedCount = $laporan->where('status', 'Tercapai')->count();
         $unachievedCount = $laporan->where('status', '!=', 'Tercapai')->count();
+
+        $globalSetting = Pengaturan::whereNotNull('threshold_tercapai')->first();
+        $thresholdTercapai = (float) ($globalSetting?->threshold_tercapai ?? 100.00);
+        $thresholdPerluPerhatian = (float) ($globalSetting?->threshold_perlu_perhatian ?? 60.00);
 
         return view('adminp2mp.dashboard', compact(
             'totalUsers',
@@ -137,7 +141,9 @@ class DashboardController extends Controller
             'avgMahasiswa',
             'avgDosen',
             'achievedCount',
-            'unachievedCount'
+            'unachievedCount',
+            'thresholdTercapai',
+            'thresholdPerluPerhatian'
         ));
     }
 
